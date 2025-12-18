@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../Routes/routes.dart';
+
 class Studentprofiles extends StatefulWidget {
   const Studentprofiles({super.key});
 
@@ -9,6 +11,64 @@ class Studentprofiles extends StatefulWidget {
 }
 
 class _StudentprofilesState extends State<Studentprofiles> {
+  final List<Learner> learners = [
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Mary Wanjiku",
+      grade: "Grade 4",
+      avatar: "assets/images/shuleone.png",
+      isActive: false,
+    ),
+    Learner(
+      name: "Kevin Mwangi",
+      grade: "Grade 7",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+    Learner(
+      name: "Brian Otieno",
+      grade: "Grade 6",
+      avatar: "assets/images/shuleone.png",
+      isActive: true,
+    ),
+
+  ];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -80,9 +140,105 @@ class _StudentprofilesState extends State<Studentprofiles> {
               ],
             ),
           ),
-
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: learners.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: learnerCard(context, learners[index]),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
+  Widget learnerCard(BuildContext context, Learner learner) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: (){
+        Navigator.pushNamed(context, RouteHelper.parentdashboardpage);
+      },
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Avatar
+              CircleAvatar(
+                radius: 26,
+                backgroundImage: AssetImage(learner.avatar),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Name & grade
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      learner.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      learner.grade,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Status chip
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: learner.isActive
+                      ? Colors.green.withOpacity(0.15)
+                      : Colors.grey.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  learner.isActive ? "Active" : "Inactive",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: learner.isActive ? Colors.green : Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+}
+
+class Learner {
+  final String name;
+  final String grade;
+  final String avatar;
+  final bool isActive;
+
+  Learner({
+    required this.name,
+    required this.grade,
+    required this.avatar,
+    required this.isActive,
+  });
 }

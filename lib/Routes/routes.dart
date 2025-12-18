@@ -3,6 +3,7 @@ import '../Authentication/ResetPasswordPage.dart';
 import '../Authentication/Signin.dart';
 import '../Authentication/Signup.dart';
 import '../MainDashBoardPage/MainDashBoardPage.dart';
+import '../ParentsPages/ParentDashBoardPage.dart';
 import '../StudentProfiles/studentprofiles.dart';
 
 
@@ -12,6 +13,7 @@ class RouteHelper{
   static  const String resetpasswordpage="/resetpasswordpage";
   static  const String maindashboardpage="/maindashboardpage";
   static  const String studentprofiles="/studentprofiles";
+  static  const String parentdashboardpage="/parentdashboardpage";
 
 
   static Map<String,WidgetBuilder> getRoutes(){
@@ -21,6 +23,7 @@ class RouteHelper{
       resetpasswordpage:(context)=>const Resetpasswordpage(),
       maindashboardpage:(context)=>const Maindashboardpage(),
       studentprofiles:(context)=>const Studentprofiles(),
+      parentdashboardpage:(context)=>const Parentdashboardpage(),
 
 
 
