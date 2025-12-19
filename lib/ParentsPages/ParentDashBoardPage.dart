@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../Widgets/ExamActionRow.dart';
+import '../Widgets/GradesCardWidget.dart';
 import '../Widgets/IntroductionWidget.dart';
+import '../Widgets/StatsMinCard.dart';
+import '../Widgets/SubjectMarksChart.dart';
+import '../Widgets/SubjectResutsTable.dart';
 
 class Parentdashboardpage extends StatefulWidget {
   const Parentdashboardpage({super.key});
@@ -11,8 +15,8 @@ class Parentdashboardpage extends StatefulWidget {
 }
 
 class _ParentdashboardpageState extends State<Parentdashboardpage> {
-
   Exam? selectedExam;
+  int _currentIndex = 0;
 
   final List<Exam> exams = [
     Exam(name: "Opener Exam", term: "Term 1", form: "Form 2"),
@@ -20,7 +24,6 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
     Exam(name: "End Term", term: "Term 2", form: "Form 3"),
     Exam(name: "Mock Exam", term: "Term 3", form: "Form 4"),
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +55,7 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                           "ShuleOne Academy",
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Colors.white
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -90,78 +93,203 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                     ),
                   ],
                 ),
-
               ],
             ),
           ),
-          Expanded(child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Introductionwidget(
-                ),
-                SizedBox(height: screenHeight * 0.02,),
-                Text("Analysis",style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold,letterSpacing: 0.2,),),
-                Text("Student's Exam Performance Analysis",style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal,color: theme.disabledColor),),
-                SizedBox(height: screenHeight * 0.02),
-                ExamActionRow(
-                  selectedExam: selectedExam,
-                  exams: exams,
-                  onExamChanged: (exam) {
-                    setState(() {
-                      selectedExam = exam;
-                    });
-                  },
-                  onDownloadSelected: (type) {
-                    if (type == "transcript") {
-                      debugPrint("Download Transcript for $selectedExam");
-                    } else if (type == "report") {
-                      debugPrint("Download Report Form for $selectedExam");
-                    }
-                  },
-                ),
-                SizedBox(height: screenHeight * 0.02),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Curriculum Subjects",
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
+          DefaultTabController(
+            length: 3, // Dashboard, Assignments, Live Classes
+            child: Expanded(
+              child: Column(
+                children: [
+                  TabBar(
+                    labelColor: theme.primaryColor,
+                    unselectedLabelColor: theme.disabledColor,
+                    indicatorColor: theme.primaryColor,
+                    tabs: const [
+                      Tab(text: "Dashboard"),
+                      Tab(text: "Assignments"),
+                      Tab(text: "Live Classes"),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
                       children: [
-                        /// Primary color underline (fixed width)
-                        Container(
-                          height: 2,
-                          width: screenWidth * 0.4,
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor,
-                            borderRadius: BorderRadius.circular(2),
+                        // 1️⃣ Dashboard tab
+                        SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Introductionwidget(),
+                                SizedBox(height: screenHeight * 0.02),
+                                Text(
+                                  "Analysis",
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                                Text(
+                                  "Student's Exam Performance Analysis",
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                    color: theme.disabledColor,
+                                  ),
+                                ),
+                                SizedBox(height: screenHeight * 0.02),
+                                ExamActionRow(
+                                  selectedExam: selectedExam,
+                                  exams: exams,
+                                  onExamChanged: (exam) {
+                                    setState(() {
+                                      selectedExam = exam;
+                                    });
+                                  },
+                                  onDownloadSelected: (type) {
+                                    if (type == "transcript") {
+                                      debugPrint("Download Transcript for $selectedExam");
+                                    } else if (type == "report") {
+                                      debugPrint("Download Report Form for $selectedExam");
+                                    }
+                                  },
+                                ),
+                                SizedBox(height: screenHeight * 0.02),
+                                Gradescardwidget(),
+                                SizedBox(height: screenHeight * 0.02),
+                                Row(
+                                  children: const [
+                                    Expanded(
+                                      child: StatsMiniCard(
+                                        title: "Mean Marks",
+                                        value: "66%",
+                                        trendIcon: Icons.trending_up,
+                                        trendValue: "7",
+                                        trendColor: Colors.green,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: StatsMiniCard(
+                                        title: "Total Points",
+                                        value: "64/96",
+                                        trendIcon: Icons.trending_down,
+                                        trendValue: "7",
+                                        trendColor: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: screenHeight * 0.02),
+                                Row( children: const [ Expanded( child: StatsMiniCard( title: "Overall Position", value: "104/441", trendIcon: Icons.trending_up, trendValue: "60", trendColor: Colors.green, ), ), SizedBox(width: 12), Expanded( child: StatsMiniCard( title: "Stream Position", value: "16/55", trendIcon: Icons.trending_up, trendValue: "6", trendColor: Colors.green, ), ), ], ),
+                                SizedBox(height: screenHeight * 0.02),
+                                SubjectMarksChart(
+                                  subjectMarks: {
+                                    "Math": 72,
+                                    "Eng": 65,
+                                    "Bio": 70,
+                                    "Chem": 58,
+                                    "Phy": 61,
+                                    "Geo": 75,
+                                  },
+                                ),
+                                SizedBox(height: screenHeight * 0.02),
+                                SubjectResultsTable(),
+                              ],
+                            ),
                           ),
                         ),
-                        /// Disabled color remainder
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            color: theme.disabledColor.withOpacity(0.3),
+
+                        // 2️⃣ Assignments tab
+                        SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: const [
+                                Text("Assignments will be shown here"),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // 3️⃣ Live Classes tab
+                        SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: const [
+                                Text("Live Classes will be shown here"),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-
-
-              ],
+                  ),
+                ],
+              ),
             ),
-          ))
+          )
+
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: theme.primaryColor,
+        unselectedItemColor: theme.disabledColor,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        showUnselectedLabels: true,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+
+          // Optional navigation logic
+          switch (index) {
+            case 0:
+            // Dashboard
+              break;
+            case 1:
+            // Coding
+              break;
+            case 2:
+            // E-Library
+              break;
+            case 3:
+            // Transport
+              break;
+            case 4:
+            // Communication
+              break;
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_outlined),
+            activeIcon: Icon(Icons.dashboard),
+            label: "Dashboard",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.code_outlined),
+            activeIcon: Icon(Icons.code),
+            label: "Coding",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book_outlined),
+            activeIcon: Icon(Icons.menu_book),
+            label: "E-Library",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_bus_outlined),
+            activeIcon: Icon(Icons.directions_bus),
+            label: "Transport",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            activeIcon: Icon(Icons.chat_bubble),
+            label: "Communication",
+          ),
         ],
       ),
     );

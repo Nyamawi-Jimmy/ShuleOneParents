@@ -79,7 +79,7 @@ class Introductionwidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                   SizedBox(height:  screenHeight*0.02),
+                   SizedBox(height:  screenHeight*0.01),
                   Text(
                     "ShuleOne E-Learning App",
                     textAlign: TextAlign.center,

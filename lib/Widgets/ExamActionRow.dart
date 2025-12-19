@@ -71,7 +71,7 @@ class ExamActionRow extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.download, color: Colors.white),
+                   Icon(FontAwesomeIcons.download, color: Colors.white),
                   const SizedBox(width: 8),
                   Text(
                     "Download",
