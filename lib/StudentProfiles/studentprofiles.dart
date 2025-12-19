@@ -161,7 +161,7 @@ class _StudentprofilesState extends State<Studentprofiles> {
 
     return InkWell(
       onTap: (){
-        Navigator.pushNamed(context, RouteHelper.parentdashboardpage);
+        Navigator.pushNamed(context, RouteHelper.parenthomepage);
       },
       child: Card(
         elevation: 3,

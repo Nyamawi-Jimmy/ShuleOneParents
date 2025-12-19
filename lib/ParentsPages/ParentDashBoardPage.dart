@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../Widgets/AssignmentCardWidget.dart';
+import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/ExamActionRow.dart';
 import '../Widgets/GradesCardWidget.dart';
 import '../Widgets/IntroductionWidget.dart';
+import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
 import '../Widgets/SubjectResutsTable.dart';
@@ -123,6 +126,9 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                               children: [
                                 Introductionwidget(),
                                 SizedBox(height: screenHeight * 0.02),
+                                BalanceCardWidget(),
+                                SizedBox(height: screenHeight * 0.02),
+
                                 Text(
                                   "Analysis",
                                   style: theme.textTheme.titleMedium?.copyWith(
@@ -205,22 +211,56 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              children: const [
-                                Text("Assignments will be shown here"),
+                              children:  [
+                                AssignmentCard(
+                                  assignmentName: "Math Homework 1",
+                                  deadline: "20 Dec 2025",
+                                  status: AssignmentStatus.Marked,
+                                  score: 88.5,
+                                ),
+                                AssignmentCard(
+                                  assignmentName: "Science Project",
+                                  deadline: "22 Dec 2025",
+                                  status: AssignmentStatus.InProgress,
+                                ),
+                                AssignmentCard(
+                                  assignmentName: "English Essay",
+                                  deadline: "25 Dec 2025",
+                                  status: AssignmentStatus.Pending,
+                                ),
                               ],
-                            ),
+                            )
+
                           ),
                         ),
 
                         // 3️⃣ Live Classes tab
                         SingleChildScrollView(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:  EdgeInsets.all(8.0),
                             child: Column(
-                              children: const [
-                                Text("Live Classes will be shown here"),
+                              children:  [
+                                LiveClassCard(
+                                  title: "Math Revision",
+                                  subtitle: "Algebra & Geometry",
+                                  status: LiveClassStatus.Live,
+                                  startsOn: "19 Dec 2025, 10:00 AM",
+                                ),
+                                LiveClassCard(
+                                  title: "Physics Lab",
+                                  subtitle: "Practical Experiments",
+                                  status: LiveClassStatus.Pending,
+                                  startsOn: "20 Dec 2025, 2:00 PM",
+                                ),
+                                LiveClassCard(
+                                  title: "English Literature",
+                                  subtitle: "Poetry Analysis",
+                                  status: LiveClassStatus.Finished,
+                                  startsOn: "18 Dec 2025, 11:00 AM",
+                                ),
                               ],
-                            ),
+                            )
+                            ,
                           ),
                         ),
                       ],
@@ -231,65 +271,6 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
             ),
           )
 
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: theme.primaryColor,
-        unselectedItemColor: theme.disabledColor,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-        showUnselectedLabels: true,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-
-          // Optional navigation logic
-          switch (index) {
-            case 0:
-            // Dashboard
-              break;
-            case 1:
-            // Coding
-              break;
-            case 2:
-            // E-Library
-              break;
-            case 3:
-            // Transport
-              break;
-            case 4:
-            // Communication
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            activeIcon: Icon(Icons.dashboard),
-            label: "Dashboard",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.code_outlined),
-            activeIcon: Icon(Icons.code),
-            label: "Coding",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book_outlined),
-            activeIcon: Icon(Icons.menu_book),
-            label: "E-Library",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_bus_outlined),
-            activeIcon: Icon(Icons.directions_bus),
-            label: "Transport",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: "Communication",
-          ),
         ],
       ),
     );
