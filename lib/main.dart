@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'ShuleOne Parents',
       theme: AppTheme.light,
-      //darkTheme: AppTheme.dark,
+      darkTheme: AppTheme.dark,
       themeMode: _themeMode,
       home: Signin(),
       initialRoute: RouteHelper.signin,

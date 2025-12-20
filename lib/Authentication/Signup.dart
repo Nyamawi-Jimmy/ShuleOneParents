@@ -79,14 +79,14 @@ class _SignUpState extends State<SignUp> {
         child: SingleChildScrollView(
           child: Container(
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.symmetric(vertical: 30.0,horizontal: 12),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                        height: screenHeight * 0.12),
+                        height: screenHeight * 0.07),
                     Text("Sign Up", style: theme.textTheme.titleLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold
@@ -208,7 +208,9 @@ class _SignUpState extends State<SignUp> {
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Contact Information",
-                            style: Theme.of(context).textTheme.titleSmall,
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: Colors.white
+                            ),
                           ),
                         ),
                         Expanded(
@@ -267,7 +269,9 @@ class _SignUpState extends State<SignUp> {
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Security Informaton",
-                            style: Theme.of(context).textTheme.titleSmall,
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: Colors.white
+                            ),
                           ),
                         ),
                         Expanded(
@@ -318,10 +322,6 @@ class _SignUpState extends State<SignUp> {
                         return null;
                       },
                     ),
-
-                    SizedBox(height: screenHeight * 0.02),
-
-
                     // Submit Button
                     Column(
                       children: [
@@ -333,7 +333,9 @@ class _SignUpState extends State<SignUp> {
                           children: [
                             Text(
                               "Already have an account? ",
-                              style: Theme.of(context).textTheme.bodyMedium,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.white
+                              ),
                             ),
                             GestureDetector(
                               onTap: () {

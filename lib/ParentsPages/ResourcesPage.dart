@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../Widgets/ExamActionRow.dart';
+import 'EbookParentPage.dart';
+import 'ParentVideoLessons.dart';
+import 'ParentsPastPapersPage.dart';
+import 'ParentsQuizPage.dart';
 
 class Resourcespage extends StatefulWidget {
   const Resourcespage({super.key});
@@ -10,8 +14,6 @@ class Resourcespage extends StatefulWidget {
 
 class _ResourcespageState extends State<Resourcespage> {
   Exam? selectedExam;
-  int _currentIndex = 4;
-
 
   @override
   Widget build(BuildContext context) {
@@ -98,95 +100,24 @@ class _ResourcespageState extends State<Resourcespage> {
                       Tab(text: "PatPapers"),
                       Tab(text: "Quizes"),
                       Tab(text: "VideoLessons"),
-
                     ],
                   ),
                   Expanded(
                     child: TabBarView(
                       children: [
                         // 1️⃣ Dashboard tab
-                        SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Ebooks",
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-
-                              ],
-                            ),
-                          ),
-                        ),
-
+                        EbookLibraryPage(),
                         // 2️⃣ Assignments tab
-                        SingleChildScrollView(
-                          child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "PastPapers",
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.2,
-                                    ),
-                                  ),
-
-                                ],                              )
-
-                          ),
-                        ),
-
-                        // 3️⃣ Live Classes tab
-                        SingleChildScrollView(
-                          child: Padding(
-                            padding:  EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "Quizes",
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-
-                              ],                            )
-                            ,
-                          ),
-                        ),
-                        SingleChildScrollView(
-                          child: Padding(
-                            padding:  EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "Video Lessons",
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-
-                              ],                            )
-                            ,
-                          ),
-                        ),
-
+                        PastPapersPage(),                        // 3️⃣ Live Classes tab
+                        Parentsquizpage(),
+                        VideoLessonsPage()
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-          )
-
+          ),
         ],
       ),
     );

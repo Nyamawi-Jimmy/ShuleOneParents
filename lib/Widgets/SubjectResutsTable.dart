@@ -40,33 +40,46 @@ class SubjectResultsTable extends StatelessWidget {
           /// Horizontal scroll safety
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: DataTable(
-              headingRowHeight: 42,
-              dataRowHeight: 44,
-              columnSpacing: 24,
-              headingTextStyle: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: theme.primaryColor,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width,
               ),
-              dataTextStyle: theme.textTheme.bodySmall,
-              columns: const [
-                DataColumn(label: Text("Subject")),
-                DataColumn(label: Text("Marks")),
-                DataColumn(label: Text("Grade")),
-                DataColumn(label: Text("Position")),
-                DataColumn(label: Text("Deviation")),
-              ],
-              rows: results.map((r) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(r.subject)),
-                    DataCell(Text(r.marks.toString())),
-                    DataCell(_gradeChip(r.grade, theme)),
-                    DataCell(Text(r.position.toString())),
-                    DataCell(_deviationText(r.deviation, theme)),
-                  ],
-                );
-              }).toList(),
+              child: DataTable(
+                headingRowHeight: 42,
+                dataRowHeight: 44,
+                columnSpacing: 24,
+                headingTextStyle: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.primaryColor,
+                ),
+                dataTextStyle: theme.textTheme.bodySmall,
+                columns: const [
+                  DataColumn(label: Text("Subject")),
+                  DataColumn(label: Text("Marks")),
+                  DataColumn(label: Text("Grade")),
+                  DataColumn(label: Text("Position")),
+                  DataColumn(label: Text("Deviation")),
+                ],
+                rows: results.map((r) {
+                  return DataRow(
+                    cells: [
+                      DataCell(
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 120),
+                          child: Text(
+                            r.subject,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      DataCell(Text(r.marks.toString())),
+                      DataCell(_gradeChip(r.grade, theme)),
+                      DataCell(Text(r.position.toString())),
+                      DataCell(_deviationText(r.deviation, theme)),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ],

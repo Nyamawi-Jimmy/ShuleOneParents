@@ -48,14 +48,14 @@ class _SigninState extends State<Signin> {
         ),
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 30),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                      height: screenHeight * 0.15),
+                      height: screenHeight * 0.07),
                   Text("Log In", style: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                     fontWeight: FontWeight.bold

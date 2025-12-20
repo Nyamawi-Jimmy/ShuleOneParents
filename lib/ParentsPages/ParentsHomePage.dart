@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'CodingPage.dart';
 import 'CommunicationPages.dart';
 import 'ParentDashBoardPage.dart';
+import 'ParentProfilePage.dart';
 import 'ResourcesPage.dart';
 import 'TransportPage.dart';
 
@@ -21,8 +22,9 @@ class _ParentshomepageState extends State<Parentshomepage> {
     Parentdashboardpage(),
     Codingpage(),
     Resourcespage(),
-    Transportpage(),
-    Communicationpages(),
+    TransportPage(),
+    Parentprofilepage(),
+    //Communicationpages(),
   ];
 
   @override
@@ -68,9 +70,9 @@ class _ParentshomepageState extends State<Parentshomepage> {
             label: "Transport",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
+            icon: Icon(Icons.person_pin),
             activeIcon: Icon(Icons.chat_bubble),
-            label: "Communication",
+            label: "Profile",
           ),
         ],
       ),
