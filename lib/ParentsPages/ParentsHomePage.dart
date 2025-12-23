@@ -23,8 +23,8 @@ class _ParentshomepageState extends State<Parentshomepage> {
     Codingpage(),
     Resourcespage(),
     TransportPage(),
-    Parentprofilepage(),
-    //Communicationpages(),
+    //Parentprofilepage(),
+    Communicationpages(),
   ];
 
   @override
@@ -70,9 +70,9 @@ class _ParentshomepageState extends State<Parentshomepage> {
             label: "Transport",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_pin),
+            icon: Icon(Icons.message),
             activeIcon: Icon(Icons.chat_bubble),
-            label: "Profile",
+            label: "Communication",
           ),
         ],
       ),

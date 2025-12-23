@@ -9,6 +9,8 @@ import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
 import '../Widgets/SubjectResutsTable.dart';
+import 'ParentProfilePage.dart';
+import 'SettingsParentPage.dart';
 
 class Parentdashboardpage extends StatefulWidget {
   const Parentdashboardpage({super.key});
@@ -46,7 +48,6 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
               children: [
                 Row(
                   children: [
-                    SizedBox(width: screenWidth * 0.02),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -86,14 +87,45 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                       ],
                     ),
                     SizedBox(width: screenWidth * 0.02),
-                    ClipOval(
-                      child: Image.asset(
-                        "assets/images/shuleone.png",
-                        fit: BoxFit.cover,
-                        height: 40,
-                        width: 40,
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'profile') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const Parentprofilepage()),
+                          );
+                        } else if (value == 'settings') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const Settingsparentpage()),
+                          );
+                        }
+                      },
+                      itemBuilder: (context) => [
+                         PopupMenuItem(
+                          value: 'profile',
+                          child: ListTile(
+                            leading: Icon(Icons.person,color: theme.primaryColor,),
+                            title: Text('Profile'),
+                          ),
+                        ),
+                         PopupMenuItem(
+                          value: 'settings',
+                          child: ListTile(
+                            leading: Icon(Icons.settings,color: theme.primaryColor,),
+                            title: Text('Settings'),
+                          ),
+                        ),
+                      ],
+                      child: ClipOval(
+                        child: Image.asset(
+                          "assets/images/shuleone.png",
+                          fit: BoxFit.cover,
+                          height: 40,
+                          width: 40,
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],

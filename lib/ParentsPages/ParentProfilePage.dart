@@ -44,6 +44,17 @@ class _ParentprofilepageState extends State<Parentprofilepage> {
               children: [
                 Row(
                   children: [
+
+                    GestureDetector(
+                      onTap:(){
+                        Navigator.of(context).pop();
+                      },
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
                     SizedBox(width: screenWidth * 0.02),
                     Container(
                       decoration: BoxDecoration(

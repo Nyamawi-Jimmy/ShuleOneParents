@@ -10,7 +10,6 @@ class Communicationpages extends StatefulWidget {
 
 class _CommunicationpagesState extends State<Communicationpages> {
   Exam? selectedExam;
-  int _currentIndex = 4;
 
 
   @override

@@ -61,7 +61,7 @@ class _InviteFriendsState extends State<InviteFriends> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Invite friends and help them manage their finances",
+                  "Invite friends and help them manage their students academics",
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
