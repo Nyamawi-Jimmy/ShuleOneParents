@@ -110,7 +110,7 @@ class _SettingsparentpageState extends State<Settingsparentpage> {
                     leadingIcon: Icons.arrow_forward_ios,
                     trailingIcon: Icons.settings,
                     onTap: () {
-                      //Navigator.pushNamed(context,RouteHelper.settings);
+                      Navigator.pushNamed(context,RouteHelper.miniparentsettings);
                     },
                   ),
                   SizedBox(height: screenHeight * 0.02),
@@ -126,6 +126,14 @@ class _SettingsparentpageState extends State<Settingsparentpage> {
 
                   Profilerowitems(
                     title: "Personal Details",
+                    leadingIcon: Icons.arrow_forward_ios,
+                    trailingIcon: Icons.person_pin,
+                    onTap: () {},
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+
+                  Profilerowitems(
+                    title: "Parents/Guardians Details",
                     leadingIcon: Icons.arrow_forward_ios,
                     trailingIcon: Icons.person_pin,
                     onTap: () {},

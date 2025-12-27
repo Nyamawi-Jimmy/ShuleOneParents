@@ -4,7 +4,6 @@ import '../Widgets/AssignmentCardWidget.dart';
 import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/ExamActionRow.dart';
 import '../Widgets/GradesCardWidget.dart';
-import '../Widgets/IntroductionWidget.dart';
 import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
@@ -156,7 +155,6 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Introductionwidget(),
                                 SizedBox(height: screenHeight * 0.02),
                                 BalanceCardWidget(),
                                 SizedBox(height: screenHeight * 0.02),

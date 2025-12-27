@@ -1,67 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:riverpod/src/framework.dart';
+import 'package:shuleoneparents/Authentication/registernotifier/classes_notifier.dart';
+import 'package:shuleoneparents/Authentication/registernotifier/nextAdmNotifier.dart';
+import 'package:shuleoneparents/Authentication/registernotifier/register_notifier.dart';
 
 import '../Routes/routes.dart';
 import '../Widgets/DropdownWidget.dart';
 import '../Widgets/TextFormFieldWidget.dart';
 
-class SignUp extends StatefulWidget {
+class SignUp extends ConsumerStatefulWidget {
   const SignUp({super.key});
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  ConsumerState<SignUp> createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _SignUpState extends ConsumerState<SignUp> {
   final _formKey = GlobalKey<FormState>();
   String? _gender;
   String? _selectedClass;
-  final List<String> _classes = [
-    "PP1",
-    "PP2",
-    "Grade 1",
-    "Grade 2",
-    "Grade 3",
-    "Grade 4",
-    "Grade 5",
-    "Grade 6",
-  ];
-
-  final _firstnameController = TextEditingController();
-  final _middlenameController = TextEditingController();
-  final _lastnameController = TextEditingController();
-  final _usernameController = TextEditingController();
-  final _admnoController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPinController = TextEditingController();
-
-
   bool _showPin = false;
   bool _showConfirmPin = false;
 
-
-  void _submitForm() {
-    if (_formKey.currentState!.validate() ) {
-      // TODO: Connect to API
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Account created successfully!")),
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final regProvider = ref.watch(registerProvider);
+    final classesAsync = ref.watch(classesProvider);
+    final nextAdmValue = ref.watch(nextAdmProvider).value;
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -79,37 +54,49 @@ class _SignUpState extends State<SignUp> {
         child: SingleChildScrollView(
           child: Container(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30.0,horizontal: 12),
+              padding: const EdgeInsets.symmetric(
+                vertical: 30.0,
+                horizontal: 12,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                        height: screenHeight * 0.07),
-                    Text("Sign Up", style: theme.textTheme.titleLarge?.copyWith(
+                    SizedBox(height: screenHeight * 0.07),
+                    Text(
+                      "Sign Up",
+                      style: theme.textTheme.titleLarge?.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold
-                    )),
-                    SizedBox(
-                        height: screenHeight * 0.04),
-                    Text("Welcome!", style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+                    Text(
+                      "Welcome!",
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.w500
-                    )),
-                    SizedBox(
-                        height: screenHeight * 0.01),
-                    Text("Create Account", style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.01),
+                    Text(
+                      "Create Account",
+                      style: theme.textTheme.titleLarge?.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.w600
-                    )),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
 
-                    SizedBox(
-                        height: screenHeight * 0.02),
+                    SizedBox(height: screenHeight * 0.02),
                     CustomTextField(
                       label: "First Name",
                       hint: "Enter your firstName",
-                      controller: _firstnameController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onFirstNameChanged(value);
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "FirstName is required";
@@ -125,7 +112,11 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Middle Name",
                       hint: "Enter your middle name",
-                      controller: _middlenameController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onMiddleNameChanged(value);
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Middle Name is Requirred";
@@ -141,7 +132,11 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Last Name",
                       hint: "Enter your middle name",
-                      controller: _lastnameController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onLastNameChanged(value);
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Lat Name is Requirred";
@@ -155,7 +150,12 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "User Name",
                       hint: "Enter username",
-                      controller: _usernameController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onUserNameChanged(value);
+                      },
+
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "User Name is Required";
@@ -170,28 +170,48 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Admission Number",
                       hint: "Enter Admission Number",
-                      controller: _admnoController,
+                      initialValue: nextAdmValue?.nextadm ?? "",
+                      func: (value) {
+                        ref.read(registerProvider.notifier).onadmChanged(value);
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Admission Number is Required";
                         }
                         return null;
                       },
-                      suffixIcon: Icons.person_pin,
+                      suffixIcon: Icons.numbers,
                     ),
                     SizedBox(height: screenHeight * 0.02),
-                    CustomDropdownField<String>(
-                      label: "Select Class",
-                      value: _selectedClass,
-                      items: _classes, // your list of classes
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedClass = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return "Please select a class";
-                        return null;
+
+                    classesAsync.when(
+                      loading: () => const CircularProgressIndicator(),
+                      error: (err, _) => Text(
+                        'Failed to load classes',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      data: (classes) {
+                        return CustomDropdownField<String>(
+                          label: "Select Class",
+                          value: _selectedClass,
+                          items: classes.map((c) => c.classField).toList(),
+                          onChanged: (value) {
+                            if (value == null) return;
+
+                            setState(() {
+                              _selectedClass = value;
+                            });
+                            ref
+                                .read(registerProvider.notifier)
+                                .onselectedClassChanged(value);
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please select a class";
+                            }
+                            return null;
+                          },
+                        );
                       },
                     ),
                     SizedBox(height: screenHeight * 0.02),
@@ -208,9 +228,8 @@ class _SignUpState extends State<SignUp> {
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Contact Information",
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Colors.white
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(color: Colors.white),
                           ),
                         ),
                         Expanded(
@@ -226,7 +245,11 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Phone Number",
                       hint: "Enter your phone number",
-                      controller: _phoneController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onPhoneNumberchanged(value);
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty)
                           return "Phone number required";
@@ -245,7 +268,11 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Email",
                       hint: "Enter your email",
-                      controller: _emailController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onemailChanged(value);
+                      },
                       validator: (value) {
                         if (value != null && value.isNotEmpty) {
                           if (!value.contains("@"))
@@ -269,9 +296,8 @@ class _SignUpState extends State<SignUp> {
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Security Informaton",
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Colors.white
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(color: Colors.white),
                           ),
                         ),
                         Expanded(
@@ -286,7 +312,11 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Password",
                       hint: "Create Password",
-                      controller: _passwordController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onpasswordChanged(value);
+                      },
                       keyboardType: TextInputType.number,
                       obscure: !_showPin,
                       suffixIcon: _showPin
@@ -308,7 +338,11 @@ class _SignUpState extends State<SignUp> {
                     CustomTextField(
                       label: "Confirm Pin",
                       hint: "Re-enter your PIN",
-                      controller: _confirmPinController,
+                      func: (value) {
+                        ref
+                            .read(registerProvider.notifier)
+                            .onconfirmpasswordChanged(value);
+                      },
                       keyboardType: TextInputType.number,
                       obscure: !_showConfirmPin,
                       suffixIcon: _showConfirmPin
@@ -316,11 +350,6 @@ class _SignUpState extends State<SignUp> {
                           : Icons.visibility_off,
                       onTap: () =>
                           setState(() => _showConfirmPin = !_showConfirmPin),
-                      validator: (value) {
-                        if (value != _passwordController.text)
-                          return "PINs do not match";
-                        return null;
-                      },
                     ),
                     // Submit Button
                     Column(
@@ -333,9 +362,8 @@ class _SignUpState extends State<SignUp> {
                           children: [
                             Text(
                               "Already have an account? ",
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.white
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.white),
                             ),
                             GestureDetector(
                               onTap: () {
@@ -348,9 +376,9 @@ class _SignUpState extends State<SignUp> {
                                 "Login",
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ),
                           ],
@@ -360,10 +388,11 @@ class _SignUpState extends State<SignUp> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _submitForm,
+                            onPressed: () {
+                              ref.read(registerProvider.notifier).register();
+                            },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:Theme.of(context)
-                                  .primaryColor,
+                              backgroundColor: Theme.of(context).primaryColor,
                               foregroundColor: Colors.white,
                               // text color
                               minimumSize: const Size.fromHeight(50),
@@ -383,7 +412,7 @@ class _SignUpState extends State<SignUp> {
             ),
           ),
         ),
-      )
+      ),
     );
   }
 

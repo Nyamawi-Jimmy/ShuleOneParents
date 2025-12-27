@@ -3,20 +3,23 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   final String label;
   final String? hint;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final bool obscure;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final IconData? suffixIcon;
+  final String? initialValue;
+
   final int? maxLength;
   final bool readOnly;
   final VoidCallback? onTap;
+  void Function(String value)? func;
 
-  const CustomTextField({
+  CustomTextField({
     super.key,
     required this.label,
     this.hint,
-    required this.controller,
+     this.controller,
     this.obscure = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -24,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.readOnly = false,
     this.onTap,
+    this.func, this.initialValue,
   });
 
   @override
@@ -31,14 +35,19 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: Colors.white
-        )),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(color: Colors.white),
+        ),
         const SizedBox(height: 4),
         TextFormField(
+          initialValue: initialValue,
           controller: controller,
           readOnly: readOnly,
           onTap: onTap,
+          onChanged: (value)=>func!(value),
           style: TextStyle(color: Colors.white),
           obscureText: obscure,
           keyboardType: keyboardType,
@@ -47,7 +56,9 @@ class CustomTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             counterText: "",
-            suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 17,color: Colors.white,) : null,
+            suffixIcon: suffixIcon != null
+                ? Icon(suffixIcon, size: 17, color: Colors.white)
+                : null,
             iconColor: Theme.of(context).primaryColor,
             hintStyle: Theme.of(context).textTheme.displaySmall?.copyWith(
               color: Colors.white,

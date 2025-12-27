@@ -7,6 +7,7 @@ import '../ParentsPages/CommunicationPages.dart';
 import '../ParentsPages/ParentDashBoardPage.dart';
 import '../ParentsPages/ParentsHomePage.dart';
 import '../ParentsPages/ResourcesPage.dart';
+import '../ParentsPages/miniparentsettings.dart';
 import '../StudentProfiles/studentprofiles.dart';
 
 
@@ -20,6 +21,9 @@ class RouteHelper{
   static  const String communicationpages="/communicationpages";
   static  const String parenthomepage="/parenthomepage";
   static  const String resourcespage="/resourcespage";
+  static  const String miniparentsettings="/miniparentsettings";
+
+
 
 
   static Map<String,WidgetBuilder> getRoutes(){
@@ -33,7 +37,7 @@ class RouteHelper{
       communicationpages:(context)=>const Communicationpages(),
       parenthomepage:(context)=>const Parentshomepage(),
       resourcespage:(context)=>const Resourcespage(),
-
+      miniparentsettings:(context)=>const Miniparentsettings(),
 
 
     };

@@ -149,9 +149,7 @@ class _CodingpageState extends State<Codingpage> {
                         ),
 
                         // 2️⃣ Assignments tab
-                        Expanded(
-                          child: CodeEditorScreen(),
-                        ),
+                        CodeEditorScreen(),
 
 
                         // 3️⃣ Live Classes tab
