@@ -5,11 +5,13 @@ import 'package:shuleoneparents/Authentication/AuthControllers/AuthController.da
 import 'package:shuleoneparents/Authentication/AuthRepositories/AuthRepo.dart';
 import 'package:shuleoneparents/Data/Api/apiclient.dart';
 import 'package:shuleoneparents/Utils/AppConstants.dart';
-
 import '../Authentication/AuthControllers/LoginController.dart';
+import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Authentication/AuthControllers/RegGetClassesController.dart';
 import '../Authentication/AuthControllers/getNetAdmController.dart';
 import '../Authentication/AuthRepositories/nextAdmRepo.dart';
+import '../StudentControllers/MainExamsController.dart';
+import '../StudentRepositories/MainExamsRepo.dart';
 
 Future <void> init() async{
 
@@ -19,13 +21,15 @@ Future <void> init() async{
   Get.lazyPut(()=>Authrepo(apiClient: Get.find(), sharedPreferences: Get.find()));
   Get.lazyPut(()=>Nextadmrepo(apiClient: Get.find()));
   Get.lazyPut(()=>Authrepo(apiClient: Get.find(), sharedPreferences: Get.find()));
+  Get.lazyPut(()=>Mainexamsrepo(apiClient: Get.find()));
 
 
   Get.lazyPut(()=>Logincontroller(authrepo: Get.find()));
   Get.lazyPut(()=>AuthController(authrepo: Get.find()));
   Get.lazyPut(()=>Getnetadmcontroller(nextadmrepo: Get.find()));
   Get.lazyPut(()=>Reggetclassescontroller(nextclassrepo: Get.find()));
-
+  Get.lazyPut(()=>ParentController());
+  Get.lazyPut(()=>Mainexamscontroller(mainexamsrepo: Get.find()));
 
 
 }

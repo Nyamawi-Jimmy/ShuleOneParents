@@ -1,5 +1,12 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:shuleoneparents/Data/Api/apiclient.dart';
+
+import '../Models/MainExamsModal.dart';
+import '../StudentControllers/MainExamsController.dart';
 import '../Widgets/AssignmentCardWidget.dart';
 import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/ExamActionRow.dart';
@@ -8,26 +15,39 @@ import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
 import '../Widgets/SubjectResutsTable.dart';
-import 'ParentProfilePage.dart';
-import 'SettingsParentPage.dart';
 
-class Parentdashboardpage extends StatefulWidget {
-  const Parentdashboardpage({super.key});
+
+class Studentdashboard extends StatefulWidget {
+  const Studentdashboard({super.key});
 
   @override
-  State<Parentdashboardpage> createState() => _ParentdashboardpageState();
+  State<Studentdashboard> createState() => _StudentdashboardState();
 }
 
-class _ParentdashboardpageState extends State<Parentdashboardpage> {
-  Exam? selectedExam;
-  int _currentIndex = 0;
+class _StudentdashboardState extends State<Studentdashboard> {
+  MainExam? selectedExam;
+  List<MainExam> exams = [];
+  @override
+  void initState() {
+    final ApiClient apiClient = Get.find<ApiClient>();
+    _mainexansdetails();
+    super.initState();
+  }
 
-  final List<Exam> exams = [
-    Exam(name: "Opener Exam", term: "Term 1", form: "Form 2"),
-    Exam(name: "Mid Term", term: "Term 2", form: "Form 3"),
-    Exam(name: "End Term", term: "Term 2", form: "Form 3"),
-    Exam(name: "Mock Exam", term: "Term 3", form: "Form 4"),
-  ];
+  void _mainexansdetails() async {
+    final controller = Get.find<Mainexamscontroller>();
+    final response = await controller.mainexamsdetails();
+
+    if (response.isSuccess) {
+      final List data = jsonDecode(response.message);
+
+      setState(() {
+        exams = data.map((e) => MainExam.fromJson(e)).toList();
+        selectedExam = exams.isNotEmpty ? exams.first : null;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,26 +109,26 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'profile') {
-                          Navigator.push(
+                         /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Parentprofilepage()),
-                          );
+                          );*/
                         } else if (value == 'settings') {
-                          Navigator.push(
+                         /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Settingsparentpage()),
-                          );
+                          );*/
                         }
                       },
                       itemBuilder: (context) => [
-                         PopupMenuItem(
+                        PopupMenuItem(
                           value: 'profile',
                           child: ListTile(
                             leading: Icon(Icons.person,color: theme.primaryColor,),
                             title: Text('Profile'),
                           ),
                         ),
-                         PopupMenuItem(
+                        PopupMenuItem(
                           value: 'settings',
                           child: ListTile(
                             leading: Icon(Icons.settings,color: theme.primaryColor,),
@@ -174,7 +194,7 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                   ),
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
-                                /*ExamActionRow(
+                                ExamActionRow(
                                   selectedExam: selectedExam,
                                   exams: exams,
                                   onExamChanged: (exam) {
@@ -183,34 +203,35 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                     });
                                   },
                                   onDownloadSelected: (type) {
-                                    if (type == "transcript") {
-                                      debugPrint("Download Transcript for $selectedExam");
-                                    } else if (type == "report") {
-                                      debugPrint("Download Report Form for $selectedExam");
-                                    }
+                                    debugPrint("$type for ${selectedExam?.examName}");
                                   },
-                                ),*/
+                                ),
                                 SizedBox(height: screenHeight * 0.02),
-                                //Gradescardwidget(),
+                                GradesCardWidget(selectedExam: selectedExam),
                                 SizedBox(height: screenHeight * 0.02),
                                 Row(
-                                  children: const [
+                                  children:  [
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Mean Marks",
-                                        value: "66%",
+                                        value: selectedExam != null
+                                            ? "${selectedExam!.mean.toStringAsFixed(2)}%"
+                                            : "--",
                                         trendIcon: Icons.trending_up,
-                                        trendValue: "7",
+                                        trendValue: "",
                                         trendColor: Colors.green,
                                       ),
+
                                     ),
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Total Points",
-                                        value: "64/96",
+                                        value: selectedExam != null
+                                            ? selectedExam!.points.toStringAsFixed(2)
+                                            : "--",
                                         trendIcon: Icons.trending_down,
-                                        trendValue: "7",
+                                        trendValue: "",
                                         trendColor: Colors.red,
                                       ),
                                     ),
@@ -239,27 +260,27 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                         // 2️⃣ Assignments tab
                         SingleChildScrollView(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children:  [
-                                AssignmentCard(
-                                  assignmentName: "Math Homework 1",
-                                  deadline: "20 Dec 2025",
-                                  status: AssignmentStatus.Marked,
-                                  score: 88.5,
-                                ),
-                                AssignmentCard(
-                                  assignmentName: "Science Project",
-                                  deadline: "22 Dec 2025",
-                                  status: AssignmentStatus.InProgress,
-                                ),
-                                AssignmentCard(
-                                  assignmentName: "English Essay",
-                                  deadline: "25 Dec 2025",
-                                  status: AssignmentStatus.Pending,
-                                ),
-                              ],
-                            )
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children:  [
+                                  AssignmentCard(
+                                    assignmentName: "Math Homework 1",
+                                    deadline: "20 Dec 2025",
+                                    status: AssignmentStatus.Marked,
+                                    score: 88.5,
+                                  ),
+                                  AssignmentCard(
+                                    assignmentName: "Science Project",
+                                    deadline: "22 Dec 2025",
+                                    status: AssignmentStatus.InProgress,
+                                  ),
+                                  AssignmentCard(
+                                    assignmentName: "English Essay",
+                                    deadline: "25 Dec 2025",
+                                    status: AssignmentStatus.Pending,
+                                  ),
+                                ],
+                              )
 
                           ),
                         ),

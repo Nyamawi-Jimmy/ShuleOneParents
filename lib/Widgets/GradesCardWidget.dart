@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
-class Gradescardwidget extends StatelessWidget {
+import '../Models/MainExamsModal.dart';
 
-  const Gradescardwidget({super.key,});
+class GradesCardWidget extends StatelessWidget {
+  final MainExam? selectedExam;
+
+  const GradesCardWidget({super.key, this.selectedExam});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      height: screenHeight*0.09, // gives bounded height (important for Stack)
+      height: screenHeight * 0.09,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
@@ -30,7 +33,7 @@ class Gradescardwidget extends StatelessWidget {
               child: Opacity(
                 opacity: 0.51,
                 child: Image.asset(
-                  "assets/images/background.jpg", // <-- your image
+                  "assets/images/background.jpg",
                   fit: BoxFit.cover,
                 ),
               ),
@@ -43,24 +46,29 @@ class Gradescardwidget extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                 Text("Mean Grade",style: theme.textTheme.titleMedium?.copyWith(
-                   fontWeight: FontWeight.w500
-                 ),
-                 ),
-                        Text("B-",style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600
-                        ),)
-
-                      ],
-                    ),
-                    Text("FORM 2 END TERM 3 EXAM",style: theme.textTheme.titleSmall?.copyWith(
-                    )),
-
-                  ],
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Mean Grade",
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        selectedExam?.grade ?? "--",
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    ],
+                  ),
+                  Text(
+                    selectedExam?.examName ?? "Select Exam",
+                    style: theme.textTheme.titleSmall,
+                  ),
+                ],
               ),
             ),
           ],

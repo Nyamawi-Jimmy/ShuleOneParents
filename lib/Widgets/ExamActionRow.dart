@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../Models/MainExamsModal.dart';
+
 class Exam {
   final String name;
   final String term;
@@ -14,9 +16,9 @@ class Exam {
 }
 
 class ExamActionRow extends StatelessWidget {
-  final Exam? selectedExam;
-  final List<Exam> exams;
-  final ValueChanged<Exam?> onExamChanged;
+  final MainExam? selectedExam;
+  final List<MainExam> exams;
+  final ValueChanged<MainExam?> onExamChanged;
   final ValueChanged<String> onDownloadSelected;
 
   const ExamActionRow({
@@ -32,6 +34,7 @@ class ExamActionRow extends StatelessWidget {
     final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Row(
       children: [
         /// 🔹 DOWNLOAD BUTTON
@@ -41,12 +44,12 @@ class ExamActionRow extends StatelessWidget {
                 ? null
                 : (value) => onDownloadSelected(value),
             itemBuilder: (context) => [
-               PopupMenuItem(
+              PopupMenuItem(
                 value: "transcript",
                 child: Row(
                   children: [
                     Icon(FontAwesomeIcons.download, size: 20),
-                    SizedBox(width: screenWidth*0.02),
+                    SizedBox(width: screenWidth * 0.02),
                     Text("Transcript"),
                   ],
                 ),
@@ -55,15 +58,15 @@ class ExamActionRow extends StatelessWidget {
                 value: "report",
                 child: Row(
                   children: [
-                    const Icon(FontAwesomeIcons.download, size: 20),
-                    SizedBox(width: screenWidth*0.02),
-                    const Text("Report Form"),
+                    Icon(FontAwesomeIcons.download, size: 20),
+                    SizedBox(width: screenWidth * 0.02),
+                    Text("Report Form"),
                   ],
                 ),
               ),
             ],
             child: Container(
-              height: screenHeight*0.05,
+              height: screenHeight * 0.05,
               decoration: BoxDecoration(
                 color: theme.primaryColor,
                 borderRadius: BorderRadius.circular(10),
@@ -71,7 +74,7 @@ class ExamActionRow extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                   Icon(FontAwesomeIcons.download, color: Colors.white),
+                  Icon(FontAwesomeIcons.download, color: Colors.white),
                   const SizedBox(width: 8),
                   Text(
                     "Download",
@@ -93,14 +96,14 @@ class ExamActionRow extends StatelessWidget {
         /// 🔹 EXAM DROPDOWN
         Expanded(
           child: Container(
-            height: screenHeight*0.054,
+            height: screenHeight * 0.054,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               border: Border.all(color: theme.dividerColor),
               borderRadius: BorderRadius.circular(10),
             ),
             child: DropdownButtonHideUnderline(
-              child: DropdownButton<Exam>(
+              child: DropdownButton<MainExam>(
                 value: selectedExam,
                 hint: Text(
                   "Select Exam",
@@ -109,23 +112,11 @@ class ExamActionRow extends StatelessWidget {
                 isExpanded: true,
                 icon: const Icon(Icons.keyboard_arrow_down),
                 items: exams.map((exam) {
-                  return DropdownMenuItem<Exam>(
+                  return DropdownMenuItem<MainExam>(
                     value: exam,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          exam.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          "${exam.term} · ${exam.form}",
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.disabledColor,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      exam.examName,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   );
                 }).toList(),

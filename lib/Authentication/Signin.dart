@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:intl/intl.dart';
 
 import '../Models/LoginModel.dart';
@@ -175,17 +176,17 @@ class _SigninState extends State<Signin> {
                         );
                         AuthCotroller.signin(loginmodel).then((status) {
                           if (status.isSuccess) {
-                            print("Login was successfull");
-                            print(
-                              "This is the status message${status.message}",
-                            );
+
                             if (status.message == "ROLE_PARENT") {
                               Navigator.pushNamed(
                                 context,
                                 RouteHelper.studentprofiles,
                               );
                             } else {
-                              //Get.offAllNamed(RouteHelper.dashboard);
+                              Navigator.pushNamed(
+                                context,
+                                RouteHelper.studentdashboard,
+                              );
                             }
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

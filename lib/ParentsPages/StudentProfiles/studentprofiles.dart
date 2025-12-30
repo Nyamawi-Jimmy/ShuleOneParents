@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import '../../Authentication/AuthControllers/ParentControler.dart';
+import '../../Models/ChildrenModel.dart';
+import '../../Routes/routes.dart';
 
-import '../Routes/routes.dart';
 
 class Studentprofiles extends StatefulWidget {
   const Studentprofiles({super.key});
@@ -11,63 +16,7 @@ class Studentprofiles extends StatefulWidget {
 }
 
 class _StudentprofilesState extends State<Studentprofiles> {
-  final List<Learner> learners = [
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Mary Wanjiku",
-      grade: "Grade 4",
-      avatar: "assets/images/shuleone.png",
-      isActive: false,
-    ),
-    Learner(
-      name: "Kevin Mwangi",
-      grade: "Grade 7",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-    Learner(
-      name: "Brian Otieno",
-      grade: "Grade 6",
-      avatar: "assets/images/shuleone.png",
-      isActive: true,
-    ),
-
-  ];
+  final ParentController parentController = Get.find<ParentController>();
 
   @override
   Widget build(BuildContext context) {
@@ -117,46 +66,64 @@ class _StudentprofilesState extends State<Studentprofiles> {
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          "Jimmy 👋",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        GetBuilder<ParentController>(
+                          builder: (controller) {
+                            return Text(
+                              "${controller.fullName} 👋",
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
+
                       ],
                     ),
                     SizedBox(width: screenWidth * 0.02),
-                    ClipOval(
-                      child: Image.asset(
-                        "assets/images/shuleone.png",
-                        fit: BoxFit.cover,
-                        height: 40,
-                        width: 40,
-                      ),
+                    GetBuilder<ParentController>(
+                      builder: (controller) {
+                        return ClipOval(
+                          child: Image.network(
+                            controller.image,
+                            fit: BoxFit.cover,
+                            height: 40,
+                            width: 40,
+                          ),
+                        );
+                      },
                     ),
+
+
                   ],
                 ),
               ],
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: learners.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: learnerCard(context, learners[index]),
+            child: GetBuilder<ParentController>(
+              builder: (controller) {
+                if (controller.children.isEmpty) {
+                  return const Center(child: Text("No learners found"));
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: controller.children.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: learnerCard(context, controller.children[index]),
+                    );
+                  },
                 );
               },
             ),
-          ),
-        ],
+          ),        ],
       ),
     );
   }
-  Widget learnerCard(BuildContext context, Learner learner) {
+  Widget learnerCard(BuildContext context, ChildModel learner) {
     final theme = Theme.of(context);
 
     return InkWell(
@@ -175,7 +142,7 @@ class _StudentprofilesState extends State<Studentprofiles> {
               // Avatar
               CircleAvatar(
                 radius: 26,
-                backgroundImage: AssetImage(learner.avatar),
+                backgroundImage: NetworkImage(learner.image) ,
               ),
 
               const SizedBox(width: 12),
@@ -186,7 +153,7 @@ class _StudentprofilesState extends State<Studentprofiles> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      learner.name,
+                      learner.firstName + learner.secondName,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -206,17 +173,17 @@ class _StudentprofilesState extends State<Studentprofiles> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: learner.isActive
+                  color: learner.status =="Active"
                       ? Colors.green.withOpacity(0.15)
                       : Colors.grey.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  learner.isActive ? "Active" : "Inactive",
+                  learner.status ,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: learner.isActive ? Colors.green : Colors.grey,
+                    color: learner.status  == "Active"? Colors.green : Colors.grey,
                   ),
                 ),
               ),
