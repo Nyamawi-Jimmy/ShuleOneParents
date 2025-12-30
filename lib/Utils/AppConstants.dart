@@ -10,8 +10,6 @@ class AppConstants {
   static const String REGISTER = "/api/auth/signup";
   static const String GET_NEXT_ADM = "/api/getNextAdmission";
   static const String REG_GET_CLASSES = "/api/getClasses";
-
-
-
+  static const String SIGN_IN = "/api/auth/signin";
 
 }

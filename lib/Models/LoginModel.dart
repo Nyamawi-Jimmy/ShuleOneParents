@@ -12,6 +12,8 @@ class LoginModel {
   String? accessToken;
   String? firstName;
   String? secondName;
+  String? password;
+
 
   LoginModel(
       {this.refreshToken,
@@ -26,7 +28,9 @@ class LoginModel {
         this.viwmode,
         this.accessToken,
         this.firstName,
-        this.secondName});
+        this.secondName,
+      this.password
+      });
 
   LoginModel.fromJson(Map<String, dynamic> json) {
     refreshToken = json['refreshToken'];
@@ -51,21 +55,9 @@ class LoginModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['refreshToken'] = this.refreshToken;
-    data['id'] = this.id;
     data['username'] = this.username;
-    data['school'] = this.school;
-    data['roles'] = this.roles;
-    data['image'] = this.image;
-    data['subscription'] = this.subscription;
-    if (this.children != null) {
-      data['children'] = this.children!.map((v) => v.toJson()).toList();
-    }
-    data['tokenType'] = this.tokenType;
-    data['viwmode'] = this.viwmode;
-    data['accessToken'] = this.accessToken;
-    data['firstName'] = this.firstName;
-    data['secondName'] = this.secondName;
+    data['password'] = this.password;
+
     return data;
   }
 }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:intl/intl.dart';
 
+import '../Models/LoginModel.dart';
 import '../Routes/routes.dart';
 import '../Widgets/TextFormFieldWidget.dart';
+import 'AuthControllers/AuthController.dart';
+import 'AuthControllers/LoginController.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -15,22 +20,15 @@ class Signin extends StatefulWidget {
 
 class _SigninState extends State<Signin> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _pinController = TextEditingController();
   bool _showPin = false;
-
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Container(
@@ -38,7 +36,7 @@ class _SigninState extends State<Signin> {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/shuleone.png",),
+            image: AssetImage("assets/images/shuleone.png"),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.95), // adjust opacity here
@@ -48,39 +46,44 @@ class _SigninState extends State<Signin> {
         ),
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                      height: screenHeight * 0.07),
-                  Text("Log In", style: theme.textTheme.titleLarge?.copyWith(
+                  SizedBox(height: screenHeight * 0.07),
+                  Text(
+                    "Log In",
+                    style: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
-                    fontWeight: FontWeight.bold
-                  )),
-                  SizedBox(
-                      height: screenHeight * 0.04),
-                  Text("Welcome Back!", style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+                  Text(
+                    "Welcome Back!",
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.white,
-                      fontWeight: FontWeight.w500
-                  )),
-                  SizedBox(
-                      height: screenHeight * 0.01),
-                  Text("Enter Your Account Details", style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  Text(
+                    "Enter Your Account Details",
+                    style: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
-                      fontWeight: FontWeight.w600
-                  )),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
 
-                  SizedBox(
-                      height: screenHeight * 0.02),
+                  SizedBox(height: screenHeight * 0.02),
 
                   // PHONE NUMBER
                   CustomTextField(
                     label: "Username",
                     hint: "Enter your username",
-                    controller: _phoneController,
+                    controller: _usernameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Username required";
@@ -94,7 +97,6 @@ class _SigninState extends State<Signin> {
                     suffixIcon: Icons.email,
                   ),
 
-
                   SizedBox(height: screenHeight * 0.02),
 
                   // PIN
@@ -102,10 +104,10 @@ class _SigninState extends State<Signin> {
                     label: "Password",
                     hint: "****",
                     controller: _pinController,
-                    keyboardType: TextInputType.number,
                     obscure: !_showPin,
-                    suffixIcon:
-                    _showPin ? Icons.visibility : Icons.visibility_off,
+                    suffixIcon: _showPin
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                     onTap: () => setState(() => _showPin = !_showPin),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -120,8 +122,11 @@ class _SigninState extends State<Signin> {
                   SizedBox(height: screenHeight * 0.02),
 
                   GestureDetector(
-                    onTap: (){
-                      Navigator.pushNamed(context, RouteHelper.resetpasswordpage);
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        RouteHelper.resetpasswordpage,
+                      );
                     },
                     child: Text(
                       "Forgot password?",
@@ -137,16 +142,15 @@ class _SigninState extends State<Signin> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Dont have an account?",
+                      Text(
+                        "Dont have an account?",
                         style: theme.textTheme.titleSmall?.copyWith(
-                            color: Colors.white
-                        ),),
+                          color: Colors.white,
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () =>
-                            Navigator.pushNamed(
-                              context,
-                              RouteHelper.signup  ,
-                            ),
+                            Navigator.pushNamed(context, RouteHelper.signup),
                         child: Text(
                           "Create One",
                           style: TextStyle(
@@ -164,7 +168,40 @@ class _SigninState extends State<Signin> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, RouteHelper.studentprofiles);
+                        var AuthCotroller = Get.find<Logincontroller>();
+                        LoginModel loginmodel = LoginModel(
+                          username: _usernameController.text,
+                          password: _pinController.text,
+                        );
+                        AuthCotroller.signin(loginmodel).then((status) {
+                          if (status.isSuccess) {
+                            print("Login was successfull");
+                            print(
+                              "This is the status message${status.message}",
+                            );
+                            if (status.message == "ROLE_PARENT") {
+                              Navigator.pushNamed(
+                                context,
+                                RouteHelper.studentprofiles,
+                              );
+                            } else {
+                              //Get.offAllNamed(RouteHelper.dashboard);
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Login successfully!"),
+                              ),
+                            );
+                          } else {
+                            print("This is the message${status.message}");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(status.message),
+                              ),
+                            );
+
+                          }
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,
