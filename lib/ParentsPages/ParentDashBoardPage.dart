@@ -219,7 +219,7 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                 SizedBox(height: screenHeight * 0.02),
                                 Row( children: const [ Expanded( child: StatsMiniCard( title: "Overall Position", value: "104/441", trendIcon: Icons.trending_up, trendValue: "60", trendColor: Colors.green, ), ), SizedBox(width: 12), Expanded( child: StatsMiniCard( title: "Stream Position", value: "16/55", trendIcon: Icons.trending_up, trendValue: "6", trendColor: Colors.green, ), ), ], ),
                                 SizedBox(height: screenHeight * 0.02),
-                                SubjectMarksChart(
+                               /* SubjectMarksChart(
                                   subjectMarks: {
                                     "Math": 72,
                                     "Eng": 65,
@@ -228,9 +228,9 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                     "Phy": 61,
                                     "Geo": 75,
                                   },
-                                ),
+                                ),*/
                                 SizedBox(height: screenHeight * 0.02),
-                                SubjectResultsTable(),
+                               // SubjectResultsTable(),
                               ],
                             ),
                           ),

@@ -12,4 +12,11 @@ class AppConstants {
   static const String REG_GET_CLASSES = "/api/getClasses";
   static const String SIGN_IN = "/api/auth/signin";
   static const String STUDENT_GET_EXAMS ="/api/elearning/getmainexams";
+  static const String STUDENT_GET_FEEBALANCE ="/api/elearning/getstudentbalance";
+  static String STUDENT_EXAM_PERFORMANCE(int examId) {
+    return "/api/elearning/getExamPerformance?examId=$examId";
+  }
+
+
+
 }

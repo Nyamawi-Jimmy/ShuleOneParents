@@ -2,21 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SubjectResultsTable extends StatelessWidget {
-  const SubjectResultsTable({super.key});
+  final List<dynamic> results;
+  const SubjectResultsTable({super.key, required this.results});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    final List<SubjectResult> results = [
-      SubjectResult(subject: "Mathematics", marks: 72, grade: "B", position: 8, deviation: 5),
-      SubjectResult(subject: "English", marks: 65, grade: "B-", position: 14, deviation: 2),
-      SubjectResult(subject: "Biology", marks: 70, grade: "B", position: 10, deviation: 4),
-      SubjectResult(subject: "Chemistry", marks: 58, grade: "C+", position: 18, deviation: -1),
-      SubjectResult(subject: "Physics", marks: 61, grade: "B-", position: 15, deviation: 1),
-      SubjectResult(subject: "Geography", marks: 75, grade: "B+", position: 6, deviation: 6),
-    ];
-
+    
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -60,22 +52,20 @@ class SubjectResultsTable extends StatelessWidget {
                   DataColumn(label: Text("Position")),
                   DataColumn(label: Text("Deviation")),
                 ],
-                rows: results.map((r) {
+                rows: results.map((item) {
+                  final String subjectCode = item['sub'];
+                  final String score = item['score']; // "87/100"
+                  final String grade = item['grade'];
+                  final int position = item['position'];
+                  final int deviation = item['scoreDiff'];
+
                   return DataRow(
                     cells: [
-                      DataCell(
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 120),
-                          child: Text(
-                            r.subject,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      DataCell(Text(r.marks.toString())),
-                      DataCell(_gradeChip(r.grade, theme)),
-                      DataCell(Text(r.position.toString())),
-                      DataCell(_deviationText(r.deviation, theme)),
+                      DataCell(Text(subjectCode)),
+                      DataCell(Text(score)),
+                      DataCell(Text(grade)),
+                      DataCell(Text(position.toString())),
+                      DataCell(_deviationText(deviation, theme)),
                     ],
                   );
                 }).toList(),

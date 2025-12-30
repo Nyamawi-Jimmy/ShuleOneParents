@@ -6,6 +6,8 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:shuleoneparents/Data/Api/apiclient.dart';
 
 import '../Models/MainExamsModal.dart';
+import '../Models/StudentFeeBAlanceMOdel.dart';
+import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
 import '../Widgets/AssignmentCardWidget.dart';
 import '../Widgets/BalanceCardWidget.dart';
@@ -15,7 +17,6 @@ import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
 import '../Widgets/SubjectResutsTable.dart';
-
 
 class Studentdashboard extends StatefulWidget {
   const Studentdashboard({super.key});
@@ -27,12 +28,15 @@ class Studentdashboard extends StatefulWidget {
 class _StudentdashboardState extends State<Studentdashboard> {
   MainExam? selectedExam;
   List<MainExam> exams = [];
+
   @override
   void initState() {
-    final ApiClient apiClient = Get.find<ApiClient>();
     _mainexansdetails();
     super.initState();
   }
+  Map<String, double> _studentScores = {};
+  Map<String, double> _subjectAverages = {};
+  List<dynamic> _subjectResults = [];
 
   void _mainexansdetails() async {
     final controller = Get.find<Mainexamscontroller>();
@@ -45,8 +49,41 @@ class _StudentdashboardState extends State<Studentdashboard> {
         exams = data.map((e) => MainExam.fromJson(e)).toList();
         selectedExam = exams.isNotEmpty ? exams.first : null;
       });
+      if (selectedExam != null) {
+        _loadExamPerformance(selectedExam!.id);
+      }
     }
   }
+
+  void _loadExamPerformance(int examId) async {
+    final controller = Get.find<Getstudentsperformancecontroller>();
+    final response = await controller.getStudentPerformance(examId);
+
+    if (response.isSuccess) {
+      print(response.message);
+      final List<dynamic> data = response.message;
+      double parseScore(String score) {
+        return double.parse(score.split('/').first);
+      }
+      /// Student scores
+      final Map<String, double> studentScores = {
+        for (final item in data)
+          item['code']: parseScore(item['score']),
+      };
+
+      /// Subject averages
+      final Map<String, double> subjectAverages = {
+        for (final item in data)
+          item['code']: (item['average'] as num).toDouble(),
+      };
+      _subjectResults = data; // 👈 store full response
+      setState(() {
+        _studentScores = studentScores;
+        _subjectAverages = subjectAverages;
+      });
+    }
+  }
+
 
 
   @override
@@ -109,12 +146,12 @@ class _StudentdashboardState extends State<Studentdashboard> {
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'profile') {
-                         /* Navigator.push(
+                          /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Parentprofilepage()),
                           );*/
                         } else if (value == 'settings') {
-                         /* Navigator.push(
+                          /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Settingsparentpage()),
                           );*/
@@ -124,14 +161,20 @@ class _StudentdashboardState extends State<Studentdashboard> {
                         PopupMenuItem(
                           value: 'profile',
                           child: ListTile(
-                            leading: Icon(Icons.person,color: theme.primaryColor,),
+                            leading: Icon(
+                              Icons.person,
+                              color: theme.primaryColor,
+                            ),
                             title: Text('Profile'),
                           ),
                         ),
                         PopupMenuItem(
                           value: 'settings',
                           child: ListTile(
-                            leading: Icon(Icons.settings,color: theme.primaryColor,),
+                            leading: Icon(
+                              Icons.settings,
+                              color: theme.primaryColor,
+                            ),
                             title: Text('Settings'),
                           ),
                         ),
@@ -144,7 +187,7 @@ class _StudentdashboardState extends State<Studentdashboard> {
                           width: 40,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -200,17 +243,24 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                   onExamChanged: (exam) {
                                     setState(() {
                                       selectedExam = exam;
+                                      _studentScores = {};       // optional: clear old data
+                                      _subjectAverages = {};
                                     });
+
+                                    _loadExamPerformance(exam!.id); // 🔥 THIS WAS MISSING
                                   },
+
                                   onDownloadSelected: (type) {
-                                    debugPrint("$type for ${selectedExam?.examName}");
+                                    debugPrint(
+                                      "$type for ${selectedExam?.examName}",
+                                    );
                                   },
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
                                 GradesCardWidget(selectedExam: selectedExam),
                                 SizedBox(height: screenHeight * 0.02),
                                 Row(
-                                  children:  [
+                                  children: [
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Mean Marks",
@@ -221,14 +271,14 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                         trendValue: "",
                                         trendColor: Colors.green,
                                       ),
-
                                     ),
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Total Points",
                                         value: selectedExam != null
-                                            ? selectedExam!.points.toStringAsFixed(2)
+                                            ? selectedExam!.points
+                                                  .toStringAsFixed(2)
                                             : "--",
                                         trendIcon: Icons.trending_down,
                                         trendValue: "",
@@ -238,20 +288,38 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                   ],
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
-                                Row( children: const [ Expanded( child: StatsMiniCard( title: "Overall Position", value: "104/441", trendIcon: Icons.trending_up, trendValue: "60", trendColor: Colors.green, ), ), SizedBox(width: 12), Expanded( child: StatsMiniCard( title: "Stream Position", value: "16/55", trendIcon: Icons.trending_up, trendValue: "6", trendColor: Colors.green, ), ), ], ),
-                                SizedBox(height: screenHeight * 0.02),
-                                SubjectMarksChart(
-                                  subjectMarks: {
-                                    "Math": 72,
-                                    "Eng": 65,
-                                    "Bio": 70,
-                                    "Chem": 58,
-                                    "Phy": 61,
-                                    "Geo": 75,
-                                  },
+                                Row(
+                                  children: const [
+                                    Expanded(
+                                      child: StatsMiniCard(
+                                        title: "Overall Position",
+                                        value: "104/441",
+                                        trendIcon: Icons.trending_up,
+                                        trendValue: "60",
+                                        trendColor: Colors.green,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: StatsMiniCard(
+                                        title: "Stream Position",
+                                        value: "16/55",
+                                        trendIcon: Icons.trending_up,
+                                        trendValue: "6",
+                                        trendColor: Colors.green,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
-                                SubjectResultsTable(),
+                                SubjectMarksChart(
+                                  key: ValueKey(selectedExam?.id),
+                                  subjectMarks: _studentScores,
+                                  averageMarks: _subjectAverages,
+                                ),
+
+                                SizedBox(height: screenHeight * 0.02),
+                                SubjectResultsTable(results: _subjectResults),
                               ],
                             ),
                           ),
@@ -260,37 +328,36 @@ class _StudentdashboardState extends State<Studentdashboard> {
                         // 2️⃣ Assignments tab
                         SingleChildScrollView(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children:  [
-                                  AssignmentCard(
-                                    assignmentName: "Math Homework 1",
-                                    deadline: "20 Dec 2025",
-                                    status: AssignmentStatus.Marked,
-                                    score: 88.5,
-                                  ),
-                                  AssignmentCard(
-                                    assignmentName: "Science Project",
-                                    deadline: "22 Dec 2025",
-                                    status: AssignmentStatus.InProgress,
-                                  ),
-                                  AssignmentCard(
-                                    assignmentName: "English Essay",
-                                    deadline: "25 Dec 2025",
-                                    status: AssignmentStatus.Pending,
-                                  ),
-                                ],
-                              )
-
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                AssignmentCard(
+                                  assignmentName: "Math Homework 1",
+                                  deadline: "20 Dec 2025",
+                                  status: AssignmentStatus.Marked,
+                                  score: 88.5,
+                                ),
+                                AssignmentCard(
+                                  assignmentName: "Science Project",
+                                  deadline: "22 Dec 2025",
+                                  status: AssignmentStatus.InProgress,
+                                ),
+                                AssignmentCard(
+                                  assignmentName: "English Essay",
+                                  deadline: "25 Dec 2025",
+                                  status: AssignmentStatus.Pending,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
 
                         // 3️⃣ Live Classes tab
                         SingleChildScrollView(
                           child: Padding(
-                            padding:  EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(8.0),
                             child: Column(
-                              children:  [
+                              children: [
                                 LiveClassCard(
                                   title: "Math Revision",
                                   subtitle: "Algebra & Geometry",
@@ -310,8 +377,7 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                   startsOn: "18 Dec 2025, 11:00 AM",
                                 ),
                               ],
-                            )
-                            ,
+                            ),
                           ),
                         ),
                       ],
@@ -320,8 +386,7 @@ class _StudentdashboardState extends State<Studentdashboard> {
                 ],
               ),
             ),
-          )
-
+          ),
         ],
       ),
     );

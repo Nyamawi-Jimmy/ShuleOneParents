@@ -21,7 +21,6 @@ class Mainexamscontroller extends GetxService {
       responsemodal=Responsemodal(true,response.body);
 
     }else{
-      print("No main exams ${response.body}");
 
       responsemodal=Responsemodal(false,response.statusText!);
     }

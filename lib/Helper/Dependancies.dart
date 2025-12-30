@@ -10,7 +10,9 @@ import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Authentication/AuthControllers/RegGetClassesController.dart';
 import '../Authentication/AuthControllers/getNetAdmController.dart';
 import '../Authentication/AuthRepositories/nextAdmRepo.dart';
+import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
+import '../StudentControllers/StudentFeeBAlanceController.dart';
 import '../StudentRepositories/MainExamsRepo.dart';
 
 Future <void> init() async{
@@ -30,6 +32,8 @@ Future <void> init() async{
   Get.lazyPut(()=>Reggetclassescontroller(nextclassrepo: Get.find()));
   Get.lazyPut(()=>ParentController());
   Get.lazyPut(()=>Mainexamscontroller(mainexamsrepo: Get.find()));
+  Get.lazyPut(()=>Studentfeebalancecontroller(mainexamsrepo: Get.find()));
+  Get.lazyPut(()=>Getstudentsperformancecontroller(mainexamsrepo: Get.find()));
 
 
 }

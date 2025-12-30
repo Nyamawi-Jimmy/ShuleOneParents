@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 
 class SubjectMarksChart extends StatelessWidget {
   final Map<String, double> subjectMarks;
-
+  final Map<String, double> averageMarks;
   const SubjectMarksChart({
     super.key,
     required this.subjectMarks,
+    required this.averageMarks,
   });
 
   @override
@@ -37,6 +38,15 @@ class SubjectMarksChart extends StatelessWidget {
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.disabledColor,
             ),
+          ),
+          const SizedBox(height: 8),
+
+          Row(
+            children: [
+              _legendItem(theme.primaryColor, "Score", theme),
+              const SizedBox(width: 16),
+              _legendItem(Colors.orange, "Mean", theme),
+            ],
           ),
           const SizedBox(height: 16),
 
@@ -118,7 +128,10 @@ class SubjectMarksChart extends StatelessWidget {
                   ),
                 ),
 
-                lineBarsData: [_buildLine(theme)],
+                lineBarsData: [
+                  _buildLine(theme, subjectMarks, theme.primaryColor),
+                  _buildLine(theme, averageMarks, Colors.orange),
+                ],
               ),
             ),
           ),
@@ -127,33 +140,49 @@ class SubjectMarksChart extends StatelessWidget {
     );
   }
 
-  LineChartBarData _buildLine(ThemeData theme) {
+  LineChartBarData _buildLine(
+      ThemeData theme,
+      Map<String, double> data,
+      Color color,
+      ) {
     return LineChartBarData(
       isCurved: false,
-      color: theme.primaryColor,
+      color: color,
       barWidth: 3,
-      dotData: FlDotData(
-        show: true,
-        getDotPainter: (spot, percent, barData, index) {
-          return FlDotCirclePainter(
-            radius: 4,
-            color: theme.primaryColor,
-            strokeWidth: 2,
-            strokeColor: Colors.white,
-          );
-        },
-      ),
+      dotData: FlDotData(show: true),
       belowBarData: BarAreaData(
         show: true,
-        color: theme.primaryColor.withOpacity(0.15),
+        color: color.withOpacity(0.15),
       ),
       spots: List.generate(
-        subjectMarks.length,
+        data.length,
             (index) => FlSpot(
           index.toDouble(),
-          subjectMarks.values.elementAt(index),
+          data.values.elementAt(index),
         ),
       ),
     );
   }
+
+  Widget _legendItem(Color color, String label, ThemeData theme) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
 }
