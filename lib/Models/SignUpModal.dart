@@ -32,7 +32,6 @@ class RegisterModel {
     data["password"] = this.password;
     data["admNo"] = this.admissionNumber;
     data["studentClass"] = this.selectedClass;
-
     return data;
   }
 }

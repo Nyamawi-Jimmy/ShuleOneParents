@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:shuleoneparents/Data/Api/apiclient.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shuleoneparents/Modals/SignUpModal.dart';
+import 'package:shuleoneparents/Models/SignUpModal.dart';
 import 'package:shuleoneparents/Utils/AppConstants.dart';
 
 class Authrepo {

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:shuleoneparents/Modals/SignUpModal.dart';
+import 'package:shuleoneparents/Models/SignUpModal.dart';
 import '../../Models/ResponseModal.dart';
 import '../AuthRepositories/AuthRepo.dart';
 
