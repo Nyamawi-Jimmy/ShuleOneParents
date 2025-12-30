@@ -2,6 +2,7 @@ class MainExam {
   final int id;
   final String examName;
   final double mean;
+  final double dev; // ✅ deviation
   final String grade;
   final double points;
 
@@ -9,6 +10,7 @@ class MainExam {
     required this.id,
     required this.examName,
     required this.mean,
+    required this.dev,
     required this.grade,
     required this.points,
   });
@@ -18,6 +20,7 @@ class MainExam {
       id: json['id'],
       examName: json['examName'],
       mean: (json['Mean'] as num).toDouble(),
+      dev: (json['Dev'] as num).toDouble(), // ✅ mapped here
       grade: json['grade'],
       points: (json['points'] as num).toDouble(),
     );

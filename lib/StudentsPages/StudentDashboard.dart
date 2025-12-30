@@ -44,6 +44,7 @@ class _StudentdashboardState extends State<Studentdashboard> {
 
     if (response.isSuccess) {
       final List data = jsonDecode(response.message);
+      print(response.message);
 
       setState(() {
         exams = data.map((e) => MainExam.fromJson(e)).toList();
@@ -60,8 +61,9 @@ class _StudentdashboardState extends State<Studentdashboard> {
     final response = await controller.getStudentPerformance(examId);
 
     if (response.isSuccess) {
-      print(response.message);
       final List<dynamic> data = response.message;
+      _subjectResults = data; // 👈 store full response
+
       double parseScore(String score) {
         return double.parse(score.split('/').first);
       }
@@ -76,7 +78,6 @@ class _StudentdashboardState extends State<Studentdashboard> {
         for (final item in data)
           item['code']: (item['average'] as num).toDouble(),
       };
-      _subjectResults = data; // 👈 store full response
       setState(() {
         _studentScores = studentScores;
         _subjectAverages = subjectAverages;
@@ -84,6 +85,22 @@ class _StudentdashboardState extends State<Studentdashboard> {
     }
   }
 
+  IconData meanTrendIcon(double dev) {
+    if (dev > 0) return Icons.trending_up;
+    if (dev < 0) return Icons.trending_down;
+    return Icons.trending_flat;
+  }
+
+  Color meanTrendColor(double dev) {
+    if (dev > 0) return Colors.green;
+    if (dev < 0) return Colors.red;
+    return Colors.grey;
+  }
+
+  String meanTrendValue(double dev) {
+    if (dev == 0) return "0.00";
+    return dev > 0 ? "+${dev.toStringAsFixed(2)}" : dev.toStringAsFixed(2);
+  }
 
 
   @override
@@ -267,9 +284,15 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                         value: selectedExam != null
                                             ? "${selectedExam!.mean.toStringAsFixed(2)}%"
                                             : "--",
-                                        trendIcon: Icons.trending_up,
-                                        trendValue: "",
-                                        trendColor: Colors.green,
+                                        trendIcon: selectedExam != null
+                                            ? meanTrendIcon(selectedExam!.dev)
+                                            : Icons.trending_flat,
+                                        trendValue: selectedExam != null
+                                            ? meanTrendValue(selectedExam!.dev)
+                                            : "",
+                                        trendColor: selectedExam != null
+                                            ? meanTrendColor(selectedExam!.dev)
+                                            : Colors.grey,
                                       ),
                                     ),
                                     SizedBox(width: 12),
@@ -277,40 +300,46 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                       child: StatsMiniCard(
                                         title: "Total Points",
                                         value: selectedExam != null
-                                            ? selectedExam!.points
-                                                  .toStringAsFixed(2)
+                                            ? selectedExam!.points.toStringAsFixed(2)
                                             : "--",
-                                        trendIcon: Icons.trending_down,
-                                        trendValue: "",
-                                        trendColor: Colors.red,
+                                        trendIcon: selectedExam != null
+                                            ? meanTrendIcon(selectedExam!.dev)
+                                            : Icons.trending_flat,
+                                        trendValue: selectedExam != null
+                                            ? meanTrendValue(selectedExam!.dev)
+                                            : "",
+                                        trendColor: selectedExam != null
+                                            ? meanTrendColor(selectedExam!.dev)
+                                            : Colors.grey,
                                       ),
                                     ),
                                   ],
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
                                 Row(
-                                  children: const [
+                                  children: [
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Overall Position",
-                                        value: "104/441",
-                                        trendIcon: Icons.trending_up,
-                                        trendValue: "60",
-                                        trendColor: Colors.green,
+                                        value: "--",
+                                        trendIcon: Icons.trending_flat,
+                                        trendValue: "--",
+                                        trendColor: Colors.grey,
                                       ),
                                     ),
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Stream Position",
-                                        value: "16/55",
-                                        trendIcon: Icons.trending_up,
-                                        trendValue: "6",
-                                        trendColor: Colors.green,
+                                        value: "--",
+                                        trendIcon: Icons.trending_flat,
+                                        trendValue: "--",
+                                        trendColor: Colors.grey,
                                       ),
                                     ),
                                   ],
                                 ),
+
                                 SizedBox(height: screenHeight * 0.02),
                                 SubjectMarksChart(
                                   key: ValueKey(selectedExam?.id),

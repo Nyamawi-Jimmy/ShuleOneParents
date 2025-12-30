@@ -56,7 +56,7 @@ class SubjectResultsTable extends StatelessWidget {
                   final String subjectCode = item['sub'];
                   final String score = item['score']; // "87/100"
                   final String grade = item['grade'];
-                  final int position = item['position'];
+                  final String position = item['pos'];
                   final int deviation = item['scoreDiff'];
 
                   return DataRow(
@@ -64,7 +64,7 @@ class SubjectResultsTable extends StatelessWidget {
                       DataCell(Text(subjectCode)),
                       DataCell(Text(score)),
                       DataCell(Text(grade)),
-                      DataCell(Text(position.toString())),
+                      DataCell(Text(position)),
                       DataCell(_deviationText(deviation, theme)),
                     ],
                   );
@@ -78,43 +78,6 @@ class SubjectResultsTable extends StatelessWidget {
   }
 
   /// Grade badge
-  static Widget _gradeChip(String grade, ThemeData theme) {
-    Color color;
-
-    switch (grade) {
-      case "A":
-      case "A-":
-        color = Colors.green;
-        break;
-      case "B+":
-      case "B":
-      case "B-":
-        color = Colors.blue;
-        break;
-      case "C+":
-      case "C":
-        color = Colors.orange;
-        break;
-      default:
-        color = Colors.red;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        grade,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
   /// Deviation (+ / -)
   /// Deviation with trend icon
   static Widget _deviationText(int deviation, ThemeData theme) {

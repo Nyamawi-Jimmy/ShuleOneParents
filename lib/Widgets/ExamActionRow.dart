@@ -96,7 +96,7 @@ class ExamActionRow extends StatelessWidget {
         /// 🔹 EXAM DROPDOWN
         Expanded(
           child: Container(
-            height: screenHeight * 0.054,
+            height: screenHeight * 0.06, // slightly smaller, fits single line
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               border: Border.all(color: theme.dividerColor),
@@ -107,19 +107,43 @@ class ExamActionRow extends StatelessWidget {
                 value: selectedExam,
                 hint: Text(
                   "Select Exam",
-                  style: theme.textTheme.bodyMedium,
+                  style: theme.textTheme.bodySmall,
                 ),
                 isExpanded: true,
                 icon: const Icon(Icons.keyboard_arrow_down),
+
+                /// Selected item shows single line with ellipsis
+                selectedItemBuilder: (context) {
+                  return exams.map((exam) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        exam.examName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  }).toList();
+                },
+
+                /// Dropdown items (just exam name)
                 items: exams.map((exam) {
                   return DropdownMenuItem<MainExam>(
                     value: exam,
                     child: Text(
                       exam.examName,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   );
                 }).toList(),
+
                 onChanged: onExamChanged,
               ),
             ),
