@@ -7,6 +7,11 @@ class AppConstants {
   static const String BASE_URL = "https://portal.shuleone.co.ke";
   static const String TOKEN = "DBTOKEN";
   static const String LOGIN = "/api/auth/signin";
+  static const String REGISTER = "/api/auth/signup";
+  static const String GET_NEXT_ADM = "/api/getNextAdmission";
+  static const String REG_GET_CLASSES = "/api/getClasses";
+
+
 
 
 }

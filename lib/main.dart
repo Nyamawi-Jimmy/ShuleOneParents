@@ -1,14 +1,16 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // ADD THIS
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'Authentication/Signin.dart';
+import 'Helper/Dependancies.dart' as dep;
 import 'Routes/routes.dart';
 import 'Themes/appcolors.dart';
 import 'Widgets/SettingsWrapper.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dep.init();
 
   // ⭐ GLOBAL STATUS BAR STYLE (applies to all pages)
   SystemChrome.setSystemUIOverlayStyle(
@@ -19,7 +21,7 @@ void main() {
     ),
   );
 
-  runApp(ProviderScope(child:MyApp() ,) );
+  runApp(MyApp() );
 }
 
 class MyApp extends StatefulWidget {
@@ -47,7 +49,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ShuleOne Parents',
       theme: AppTheme.light(_appColor, scheme: _scheme),

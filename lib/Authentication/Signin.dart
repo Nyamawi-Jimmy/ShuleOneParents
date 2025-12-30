@@ -130,37 +130,6 @@ class _SigninState extends State<Signin> {
                       ),
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.03),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: theme.colorScheme.primary,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.all(6),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Need Help? WhatsApp us",
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                fontSize: 13,
-                                color: Colors.white
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(FontAwesomeIcons.whatsapp,
-                                color: theme.colorScheme.primary),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
 
                   SizedBox(height: screenHeight * 0.20),
 

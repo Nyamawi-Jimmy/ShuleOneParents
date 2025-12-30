@@ -1,39 +1,112 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:riverpod/src/framework.dart';
-import 'package:shuleoneparents/Authentication/registernotifier/classes_notifier.dart';
-import 'package:shuleoneparents/Authentication/registernotifier/nextAdmNotifier.dart';
-import 'package:shuleoneparents/Authentication/registernotifier/register_notifier.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:shuleoneparents/Authentication/AuthControllers/AuthController.dart';
+import '../Modals/RegClassesModal.dart';
+import '../Modals/SignUpModal.dart';
 import '../Routes/routes.dart';
 import '../Widgets/DropdownWidget.dart';
 import '../Widgets/TextFormFieldWidget.dart';
+import 'AuthControllers/RegGetClassesController.dart';
+import 'AuthControllers/getNetAdmController.dart';
 
-class SignUp extends ConsumerStatefulWidget {
+class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
   @override
-  ConsumerState<SignUp> createState() => _SignUpState();
+  State<SignUp> createState() => _SignUpState();
 }
 
-class _SignUpState extends ConsumerState<SignUp> {
+class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
-  String? _gender;
-  String? _selectedClass;
-  bool _showPin = false;
-  bool _showConfirmPin = false;
 
   @override
   void initState() {
+    _reggetclasses();
+    _loadNextAdm();
     super.initState();
+  }
+
+  void _loadNextAdm() async {
+    final getNextAdmController = Get.find<Getnetadmcontroller>();
+    final response = await getNextAdmController.getnextadm();
+
+    if (response.isSuccess) {
+      final List<dynamic> data = jsonDecode(response.message);
+      final nextAdm = data[0]['nextadm'];
+      _admnoController.text=nextAdm;
+      _usernameController.text = "$nextAdm@shuleone";
+    }
+  }
+  List<RegClassesModel> _classes = [];
+  RegClassesModel? _selectedClass;
+  String? _selectedClassId;
+
+  void _reggetclasses() async {
+    final getClassesController = Get.find<Reggetclassescontroller>();
+    final response = await getClassesController.reggetclasses();
+
+    if (response.isSuccess) {
+      final List<dynamic> data = response.message; // If already decoded, else use jsonDecode
+      setState(() {
+        _classes = data.map<RegClassesModel>((e) => RegClassesModel.fromJson(e)).toList();
+      });
+    }
+  }
+
+
+
+
+
+  String? _gender;
+  final _firstnameController = TextEditingController();
+  final _middlenameController = TextEditingController();
+  final _lastnameController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _admnoController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPinController = TextEditingController();
+
+  bool _showPin = false;
+  bool _showConfirmPin = false;
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      var AuthCotroller=Get.find<AuthController>();
+      RegisterModel registerModel = RegisterModel(
+        firstName: _firstnameController.text,
+        middleName: _middlenameController.text,
+        lastName: _lastnameController.text,
+        userName: _usernameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        password: _passwordController.text,
+        admissionNumber: _admnoController.text,
+        selectedClass:int.parse(_selectedClassId!),
+      );
+      print("This is it${registerModel.toString()}");
+      print("Sending${registerModel.toJson()}");
+
+      AuthCotroller.registration(registerModel).then((status){
+        if(status.isSuccess){
+          print("Account created successfully!");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Account created successfully!")),
+          );
+        }else{
+          status.message;
+        }
+      });
+
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final regProvider = ref.watch(registerProvider);
-    final classesAsync = ref.watch(classesProvider);
-    final nextAdmValue = ref.watch(nextAdmProvider).value;
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -92,11 +165,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "First Name",
                       hint: "Enter your firstName",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onFirstNameChanged(value);
-                      },
+                      controller: _firstnameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "FirstName is required";
@@ -112,11 +181,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "Middle Name",
                       hint: "Enter your middle name",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onMiddleNameChanged(value);
-                      },
+                      controller: _middlenameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Middle Name is Requirred";
@@ -132,11 +197,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "Last Name",
                       hint: "Enter your middle name",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onLastNameChanged(value);
-                      },
+                      controller: _lastnameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Lat Name is Requirred";
@@ -150,12 +211,8 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "User Name",
                       hint: "Enter username",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onUserNameChanged(value);
-                      },
-
+                      readOnly: true,
+                      controller: _usernameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "User Name is Required";
@@ -170,10 +227,8 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "Admission Number",
                       hint: "Enter Admission Number",
-                      initialValue: nextAdmValue?.nextadm ?? "",
-                      func: (value) {
-                        ref.read(registerProvider.notifier).onadmChanged(value);
-                      },
+                      readOnly: true,
+                      controller: _admnoController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Admission Number is Required";
@@ -183,35 +238,20 @@ class _SignUpState extends ConsumerState<SignUp> {
                       suffixIcon: Icons.numbers,
                     ),
                     SizedBox(height: screenHeight * 0.02),
-
-                    classesAsync.when(
-                      loading: () => const CircularProgressIndicator(),
-                      error: (err, _) => Text(
-                        'Failed to load classes',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      data: (classes) {
-                        return CustomDropdownField<String>(
-                          label: "Select Class",
-                          value: _selectedClass,
-                          items: classes.map((c) => c.classField).toList(),
-                          onChanged: (value) {
-                            if (value == null) return;
-
-                            setState(() {
-                              _selectedClass = value;
-                            });
-                            ref
-                                .read(registerProvider.notifier)
-                                .onselectedClassChanged(value);
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Please select a class";
-                            }
-                            return null;
-                          },
-                        );
+                    CustomDropdownField<RegClassesModel>(
+                      label: "Select Class",
+                      value: _selectedClass,
+                      items: _classes,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedClass = value;
+                          _selectedClassId=_selectedClass?.id.toString();
+                          print('Selected class id: ${_selectedClass?.id}');
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) return "Please select a class";
+                        return null;
                       },
                     ),
                     SizedBox(height: screenHeight * 0.02),
@@ -245,11 +285,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "Phone Number",
                       hint: "Enter your phone number",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onPhoneNumberchanged(value);
-                      },
+                      controller: _phoneController,
                       validator: (value) {
                         if (value == null || value.isEmpty)
                           return "Phone number required";
@@ -268,11 +304,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "Email",
                       hint: "Enter your email",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onemailChanged(value);
-                      },
+                      controller: _emailController,
                       validator: (value) {
                         if (value != null && value.isNotEmpty) {
                           if (!value.contains("@"))
@@ -312,11 +344,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                     CustomTextField(
                       label: "Password",
                       hint: "Create Password",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onpasswordChanged(value);
-                      },
+                      controller: _passwordController,
                       keyboardType: TextInputType.number,
                       obscure: !_showPin,
                       suffixIcon: _showPin
@@ -336,13 +364,9 @@ class _SignUpState extends ConsumerState<SignUp> {
 
                     // Confirm PIN
                     CustomTextField(
-                      label: "Confirm Pin",
-                      hint: "Re-enter your PIN",
-                      func: (value) {
-                        ref
-                            .read(registerProvider.notifier)
-                            .onconfirmpasswordChanged(value);
-                      },
+                      label: "Confirm Password",
+                      hint: "Re-enter your Password",
+                      controller: _confirmPinController,
                       keyboardType: TextInputType.number,
                       obscure: !_showConfirmPin,
                       suffixIcon: _showConfirmPin
@@ -350,6 +374,11 @@ class _SignUpState extends ConsumerState<SignUp> {
                           : Icons.visibility_off,
                       onTap: () =>
                           setState(() => _showConfirmPin = !_showConfirmPin),
+                      validator: (value) {
+                        if (value != _passwordController.text)
+                          return "PINs do not match";
+                        return null;
+                      },
                     ),
                     // Submit Button
                     Column(
@@ -388,9 +417,7 @@ class _SignUpState extends ConsumerState<SignUp> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {
-                              ref.read(registerProvider.notifier).register();
-                            },
+                            onPressed: _submitForm,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
                               foregroundColor: Colors.white,
@@ -416,59 +443,4 @@ class _SignUpState extends ConsumerState<SignUp> {
     );
   }
 
-  Widget genderSelector() {
-    final theme = Theme.of(context);
-
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () => setState(() => _gender = "Male"),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade400),
-              color: _gender == "Male"
-                  ? theme.colorScheme.primary
-                  : theme.disabledColor,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.male, size: 20, color: theme.colorScheme.secondary),
-                const SizedBox(width: 6),
-                Text("Male", style: theme.textTheme.bodyMedium!),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        GestureDetector(
-          onTap: () => setState(() => _gender = "Female"),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade400),
-              color: _gender == "Female"
-                  ? theme.colorScheme.primary
-                  : theme.disabledColor,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.female,
-                  size: 20,
-                  color: theme.colorScheme.secondary,
-                ),
-                const SizedBox(width: 6),
-                Text("Female", style: theme.textTheme.bodyMedium!),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
