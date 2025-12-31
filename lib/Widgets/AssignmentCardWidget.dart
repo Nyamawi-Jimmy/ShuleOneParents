@@ -8,6 +8,9 @@ class AssignmentCard extends StatelessWidget {
   final AssignmentStatus status;
   final double? score;
   final VoidCallback? onShowResults;
+  final VoidCallback? onStatement;
+  final VoidCallback? onReceipt;
+  final VoidCallback? onPayment;
 
   const AssignmentCard({
     super.key,
@@ -16,9 +19,12 @@ class AssignmentCard extends StatelessWidget {
     required this.status,
     this.score,
     this.onShowResults,
+    this.onStatement,
+    this.onReceipt,
+    this.onPayment,
   });
 
-  Color _getStatusColor(AssignmentStatus status, ThemeData theme) {
+  Color _getStatusColor() {
     switch (status) {
       case AssignmentStatus.Open:
         return Colors.green;
@@ -33,7 +39,7 @@ class AssignmentCard extends StatelessWidget {
     }
   }
 
-  String _getStatusText(AssignmentStatus status) {
+  String _getStatusText() {
     switch (status) {
       case AssignmentStatus.Open:
         return "Open";
@@ -51,29 +57,64 @@ class AssignmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final statusColor = _getStatusColor(status, theme);
+    final statusColor = _getStatusColor();
 
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            // Left: Assignment details
-            Expanded(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: Row(
+        children: [
+          // Vertical Status Strip
+          Container(
+            width: 6,
+            height: 100,
+            decoration: BoxDecoration(
+              color: statusColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    assignmentName,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
+                  // Assignment Name + Popup Menu (if Marked)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          assignmentName,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ),
+                      if (status == AssignmentStatus.Marked)
+                        PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert, color: theme.primaryColor),
+                          onSelected: (value) {
+                            if (value == 'view') onShowResults?.call();
+                          },
+                          itemBuilder: (_) => [
+                            const PopupMenuItem(
+                              value: 'view',
+                              child: Text("View Results"),
+                            ),
+
+                          ],
+                        ),
+                    ],
                   ),
+
                   const SizedBox(height: 6),
+                  // Deadline
                   Row(
                     children: [
                       const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
@@ -84,73 +125,41 @@ class AssignmentCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  // Status badge + Score
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Status badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          _getStatusText(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+
+                      // Score
+                      Text(
+                        score != null ? "Score: ${score!.toStringAsFixed(1)}" : "—",
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-
-            // Right: Status badge + Score + Show Results button
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Status badge
-                Container(
-                  width: 100,
-                  height: 30,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _getStatusText(status),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: statusColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Score + "Show Results" button
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      score != null
-                          ? "Score: ${score!.toStringAsFixed(1)}"
-                          : "Score: —",
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (status == AssignmentStatus.Marked && onShowResults != null)
-                      const SizedBox(width: 8),
-                    if (status == AssignmentStatus.Marked && onShowResults != null)
-                      ElevatedButton.icon(
-                        onPressed: onShowResults,
-                        icon: const Icon(Icons.bar_chart, size: 18),
-                        label: const Text(
-                          "View Results",
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          elevation: 2,
-                          backgroundColor: Colors.blueAccent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          textStyle: const TextStyle(letterSpacing: 0.5),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
