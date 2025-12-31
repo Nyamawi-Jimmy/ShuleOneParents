@@ -20,4 +20,8 @@ class Studentdashboardrepo {
     final url = AppConstants.PARENT_EXAM_PERFORMANCE(examId); // dynamic URL
     return await apiClient.getData(url);
   }
+  Future<Response> getparentassignment(int studentid) async {
+    final url = AppConstants.PARENT_ASSIGNMENTS(studentid); // dynamic URL
+    return await apiClient.getData(url);
+  }
 }

@@ -26,5 +26,11 @@ class AppConstants {
   static String PARENT_EXAM_PERFORMANCE(int examId) {
     return "/api/parent/getExamPerformance?examId=$examId";
   }
+  static String PARENT_ASSIGNMENTS(int examId) {
+    return "/api/parent/loadlistofexams/$examId";
+  }
+  static const String STUDENT_ASSIGNMENTS ="/api/elearning/loadlistofexams";
+
+
 
 }

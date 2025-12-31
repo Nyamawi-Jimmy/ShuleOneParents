@@ -10,6 +10,7 @@ import '../ParentsPages/ResourcesPage.dart';
 import '../ParentsPages/StudentProfiles/studentprofiles.dart';
 import '../ParentsPages/miniparentsettings.dart';
 import '../StudentsPages/StudentDashboard.dart';
+import '../StudentsPages/StudentHomepage.dart';
 
 
 class RouteHelper{
@@ -24,6 +25,7 @@ class RouteHelper{
   static  const String resourcespage="/resourcespage";
   static  const String miniparentsettings="/miniparentsettings";
   static  const String studentdashboard="/studentdashboard";
+  static  const String studenthomepage="/studenthomepage";
 
 
 
@@ -41,6 +43,7 @@ class RouteHelper{
       resourcespage:(context)=>const Resourcespage(),
       miniparentsettings:(context)=>const Miniparentsettings(),
       studentdashboard:(context)=> const Studentdashboard(),
+      studenthomepage:(context)=> const Studenthomepage(),
 
 
     };

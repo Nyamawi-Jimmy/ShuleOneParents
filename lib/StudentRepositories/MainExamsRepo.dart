@@ -17,6 +17,8 @@ class Mainexamsrepo {
     final url = AppConstants.STUDENT_EXAM_PERFORMANCE(examId); // dynamic URL
     return await apiClient.getData(url);
   }
-
+  Future<Response>studentassignments() async {
+    return await apiClient.getData(AppConstants.STUDENT_ASSIGNMENTS);
+  }
 
 }

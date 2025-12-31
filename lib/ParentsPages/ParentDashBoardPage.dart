@@ -6,6 +6,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Models/MainExamsModal.dart';
+import '../ParentControllers/ParentAssignmentcontroller.dart';
 import '../ParentControllers/ParentMainExamsController.dart';
 import '../ParentControllers/ParentStudentPerormanceController.dart';
 import '../StudentControllers/FeeBalanceController.dart';
@@ -19,6 +20,8 @@ import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
 import '../Widgets/SubjectResutsTable.dart';
+import 'ParentProfilePage.dart';
+import 'SettingsParentPage.dart';
 
 class Parentdashboardpage extends StatefulWidget {
   const Parentdashboardpage({super.key});
@@ -34,12 +37,14 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
   @override
   void initState() {
     _parentmainexansdetails();
+    _parentsassignments();
     super.initState();
   }
 
   Map<String, double> _studentScores = {};
   Map<String, double> _subjectAverages = {};
   List<dynamic> _subjectResults = [];
+  List<dynamic> _assignments = [];
 
   void _parentmainexansdetails() async {
     final parentController = Get.find<ParentController>();
@@ -90,6 +95,27 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
     }
   }
 
+  void _parentsassignments() async {
+    final parentController = Get.find<ParentController>();
+    final childId = parentController.selectedChildId;
+    if (childId == null) return;
+
+    final controller = Get.find<Parentassignmentcontroller>();
+    final response = await controller.getparentassignment(childId);
+
+    if (response.isSuccess) {
+      final List data = jsonDecode(response.message); // parse JSON
+      setState(() {
+        _assignments = data;
+      });
+    } else {
+      setState(() {
+        _assignments = [];
+      });
+    }
+  }
+
+
   IconData meanTrendIcon(double dev) {
     if (dev > 0) return Icons.trending_up;
     if (dev < 0) return Icons.trending_down;
@@ -105,6 +131,18 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
   String meanTrendValue(double dev) {
     if (dev == 0) return "0.00";
     return dev > 0 ? "+${dev.toStringAsFixed(2)}" : dev.toStringAsFixed(2);
+  }
+  AssignmentStatus parseStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'marked':
+        return AssignmentStatus.Marked;
+      case 'inprogress':
+        return AssignmentStatus.InProgress;
+      case 'expired':
+        return AssignmentStatus.Expired;
+      default:
+        return AssignmentStatus.Pending;
+    }
   }
 
   @override
@@ -178,15 +216,15 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'profile') {
-                          /* Navigator.push(
+                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Parentprofilepage()),
-                          );*/
+                          );
                         } else if (value == 'settings') {
-                          /* Navigator.push(
+                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Settingsparentpage()),
-                          );*/
+                          );
                         }
                       },
                       itemBuilder: (context) => [
@@ -399,24 +437,24 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              children: [
-                                AssignmentCard(
-                                  assignmentName: "Math Homework 1",
-                                  deadline: "20 Dec 2025",
-                                  status: AssignmentStatus.Marked,
-                                  score: 88.5,
-                                ),
-                                AssignmentCard(
-                                  assignmentName: "Science Project",
-                                  deadline: "22 Dec 2025",
-                                  status: AssignmentStatus.InProgress,
-                                ),
-                                AssignmentCard(
-                                  assignmentName: "English Essay",
-                                  deadline: "25 Dec 2025",
-                                  status: AssignmentStatus.Pending,
-                                ),
-                              ],
+                              children: _assignments.map((assignment) {
+                                double score = 0.0;
+
+                                // Parse score like "0/3"
+                                final scoreStr = assignment['score'] ?? "0";
+                                if (scoreStr.contains('/')) {
+                                  score = double.tryParse(scoreStr.split('/').first) ?? 0;
+                                } else {
+                                  score = double.tryParse(scoreStr) ?? 0;
+                                }
+
+                                return AssignmentCard(
+                                  assignmentName: assignment['title'] ?? "",
+                                  deadline: assignment['deadline'] ?? "",
+                                  status: parseStatus(assignment['status'] ?? ""),
+                                  score: score,
+                                );
+                              }).toList(),
                             ),
                           ),
                         ),

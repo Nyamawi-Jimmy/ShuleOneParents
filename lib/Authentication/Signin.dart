@@ -185,7 +185,7 @@ class _SigninState extends State<Signin> {
                             } else {
                               Navigator.pushNamed(
                                 context,
-                                RouteHelper.studentdashboard,
+                                RouteHelper.studenthomepage,
                               );
                             }
                             ScaffoldMessenger.of(context).showSnackBar(

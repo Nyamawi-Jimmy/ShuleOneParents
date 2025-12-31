@@ -9,9 +9,12 @@ import 'package:shuleoneparents/Data/Api/apiclient.dart';
 import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Models/MainExamsModal.dart';
 import '../Models/StudentFeeBAlanceMOdel.dart';
+import '../ParentsPages/ParentProfilePage.dart';
+import '../ParentsPages/SettingsParentPage.dart';
 import '../StudentControllers/FeeBalanceController.dart';
 import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
+import '../StudentControllers/StudentAssignmentsController.dart';
 import '../Widgets/AssignmentCardWidget.dart';
 import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/ExamActionRow.dart';
@@ -31,10 +34,12 @@ class Studentdashboard extends StatefulWidget {
 class _StudentdashboardState extends State<Studentdashboard> {
   MainExam? selectedExam;
   List<MainExam> exams = [];
+  List<dynamic> _assignments = [];
 
   @override
   void initState() {
     _mainexansdetails();
+    _studentassignments();
     super.initState();
   }
 
@@ -89,6 +94,24 @@ class _StudentdashboardState extends State<Studentdashboard> {
     }
   }
 
+  void _studentassignments() async {
+
+    final controller = Get.find<Studentassignmentscontroller>();
+    final response = await controller.studentassignments();
+
+    if (response.isSuccess) {
+      final List data = jsonDecode(response.message); // parse JSON
+      setState(() {
+        _assignments = data;
+      });
+    } else {
+      setState(() {
+        _assignments = [];
+      });
+    }
+  }
+
+
   IconData meanTrendIcon(double dev) {
     if (dev > 0) return Icons.trending_up;
     if (dev < 0) return Icons.trending_down;
@@ -106,6 +129,18 @@ class _StudentdashboardState extends State<Studentdashboard> {
     return dev > 0 ? "+${dev.toStringAsFixed(2)}" : dev.toStringAsFixed(2);
   }
 
+  AssignmentStatus parseStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'marked':
+        return AssignmentStatus.Marked;
+      case 'inprogress':
+        return AssignmentStatus.InProgress;
+      case 'expired':
+        return AssignmentStatus.Expired;
+      default:
+        return AssignmentStatus.Pending;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -163,7 +198,7 @@ class _StudentdashboardState extends State<Studentdashboard> {
                         GetBuilder<ParentController>(
                           builder: (controller) {
                             return Text(
-                              "${controller.fullName} 👋",
+                              "${controller.firstName} 👋",
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -177,15 +212,15 @@ class _StudentdashboardState extends State<Studentdashboard> {
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'profile') {
-                          /* Navigator.push(
+                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Parentprofilepage()),
-                          );*/
+                          );
                         } else if (value == 'settings') {
-                          /* Navigator.push(
+                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Settingsparentpage()),
-                          );*/
+                          );
                         }
                       },
                       itemBuilder: (context) => [
@@ -398,24 +433,25 @@ class _StudentdashboardState extends State<Studentdashboard> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              children: [
-                                AssignmentCard(
-                                  assignmentName: "Math Homework 1",
-                                  deadline: "20 Dec 2025",
-                                  status: AssignmentStatus.Marked,
-                                  score: 88.5,
-                                ),
-                                AssignmentCard(
-                                  assignmentName: "Science Project",
-                                  deadline: "22 Dec 2025",
-                                  status: AssignmentStatus.InProgress,
-                                ),
-                                AssignmentCard(
-                                  assignmentName: "English Essay",
-                                  deadline: "25 Dec 2025",
-                                  status: AssignmentStatus.Pending,
-                                ),
-                              ],
+                              children: _assignments.map((assignment) {
+                                double score = 0.0;
+
+                                // Parse score like "0/3"
+                                final scoreStr = assignment['score'] ?? "0";
+                                if (scoreStr.contains('/')) {
+                                  score = double.tryParse(scoreStr.split('/').first) ?? 0;
+                                } else {
+                                  score = double.tryParse(scoreStr) ?? 0;
+                                }
+
+                                return AssignmentCard(
+                                  assignmentName: assignment['title'] ?? "",
+                                  deadline: assignment['deadline'] ?? "",
+                                  status: parseStatus(assignment['status'] ?? ""),
+                                  score: score,
+                                  onShowResults: (){},
+                                );
+                              }).toList(),
                             ),
                           ),
                         ),
