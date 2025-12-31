@@ -2,6 +2,21 @@ import 'package:flutter/material.dart';
 
 enum LiveClassStatus { Live, Pending, Finished }
 
+extension LiveClassStatusX on LiveClassStatus {
+  static LiveClassStatus fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'live':
+        return LiveClassStatus.Live;
+      case 'pending':
+        return LiveClassStatus.Pending;
+      case 'finished':
+        return LiveClassStatus.Finished;
+      default:
+        return LiveClassStatus.Pending; // safe fallback
+    }
+  }
+}
+
 class LiveClassCard extends StatelessWidget {
   final String title;
   final String subtitle;

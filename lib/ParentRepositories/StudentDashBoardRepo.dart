@@ -24,4 +24,9 @@ class Studentdashboardrepo {
     final url = AppConstants.PARENT_ASSIGNMENTS(studentid); // dynamic URL
     return await apiClient.getData(url);
   }
+
+  Future<Response> getparentliveclasses(int studentid) async {
+    final url = AppConstants.PARENT_LIVE_CLASSES(studentid); // dynamic URL
+    return await apiClient.getData(url);
+  }
 }

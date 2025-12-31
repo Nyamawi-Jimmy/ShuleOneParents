@@ -11,6 +11,7 @@ import '../Authentication/AuthControllers/RegGetClassesController.dart';
 import '../Authentication/AuthControllers/getNetAdmController.dart';
 import '../Authentication/AuthRepositories/nextAdmRepo.dart';
 import '../ParentControllers/ParentAssignmentcontroller.dart';
+import '../ParentControllers/ParentLiveClassesController.dart';
 import '../ParentControllers/ParentMainExamsController.dart';
 import '../ParentControllers/ParentStudentFeeBalanceController.dart';
 import '../ParentControllers/ParentStudentPerormanceController.dart';
@@ -19,6 +20,7 @@ import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
 import '../StudentControllers/StudentAssignmentsController.dart';
 import '../StudentControllers/StudentFeeBAlanceController.dart';
+import '../StudentControllers/StudentLIveClassesController.dart';
 import '../StudentRepositories/MainExamsRepo.dart';
 
 Future <void> init() async{
@@ -46,6 +48,10 @@ Future <void> init() async{
   Get.lazyPut(()=>Parentmainexamscontroller(studentdashboardrepo: Get.find()));
   Get.lazyPut(()=>Parentassignmentcontroller(studentdashboardrepo: Get.find()));
   Get.lazyPut(()=>Studentassignmentscontroller(mainexamsrepo: Get.find()));
+  Get.lazyPut(()=>Studentliveclassescontroller(mainexamsrepo: Get.find()));
+  Get.lazyPut(()=>Parentliveclassescontroller(studentdashboardrepo: Get.find()));
+
+
 
 
 

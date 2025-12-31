@@ -30,6 +30,11 @@ class AppConstants {
     return "/api/parent/loadlistofexams/$examId";
   }
   static const String STUDENT_ASSIGNMENTS ="/api/elearning/loadlistofexams";
+  static const String STUDENT_LIVE_CLASSES ="/api/elearning/getliveclasses";
+
+  static String PARENT_LIVE_CLASSES(int studentid) {
+    return "/api/parent/getliveclasses/$studentid";
+  }
 
 
 

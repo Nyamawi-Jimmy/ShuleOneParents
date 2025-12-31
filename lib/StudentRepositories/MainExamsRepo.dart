@@ -20,5 +20,7 @@ class Mainexamsrepo {
   Future<Response>studentassignments() async {
     return await apiClient.getData(AppConstants.STUDENT_ASSIGNMENTS);
   }
-
+  Future<Response>studentliveclasses() async {
+    return await apiClient.getData(AppConstants.STUDENT_LIVE_CLASSES);
+  }
 }

@@ -7,6 +7,7 @@ import 'package:get/get_state_manager/src/simple/get_state.dart';
 import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Models/MainExamsModal.dart';
 import '../ParentControllers/ParentAssignmentcontroller.dart';
+import '../ParentControllers/ParentLiveClassesController.dart';
 import '../ParentControllers/ParentMainExamsController.dart';
 import '../ParentControllers/ParentStudentPerormanceController.dart';
 import '../StudentControllers/FeeBalanceController.dart';
@@ -33,11 +34,13 @@ class Parentdashboardpage extends StatefulWidget {
 class _ParentdashboardpageState extends State<Parentdashboardpage> {
   MainExam? selectedExam;
   List<MainExam> exams = [];
+  List<dynamic> _liveclasses = [];
 
   @override
   void initState() {
     _parentmainexansdetails();
     _parentsassignments();
+    _parentsliveclasses();
     super.initState();
   }
 
@@ -111,6 +114,24 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
     } else {
       setState(() {
         _assignments = [];
+      });
+    }
+  }
+  void _parentsliveclasses() async {
+    final parentController = Get.find<ParentController>();
+    final childId = parentController.selectedChildId;
+    if (childId == null) return;
+    final controller = Get.find<Parentliveclassescontroller>();
+    final response = await controller.getparentliveclasses(childId);
+
+    if (response.isSuccess) {
+      final List data = jsonDecode(response.message); // parse JSON
+      setState(() {
+        _liveclasses = data;
+      });
+    } else {
+      setState(() {
+        _liveclasses = [];
       });
     }
   }
@@ -438,21 +459,11 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               children: _assignments.map((assignment) {
-                                double score = 0.0;
-
-                                // Parse score like "0/3"
-                                final scoreStr = assignment['score'] ?? "0";
-                                if (scoreStr.contains('/')) {
-                                  score = double.tryParse(scoreStr.split('/').first) ?? 0;
-                                } else {
-                                  score = double.tryParse(scoreStr) ?? 0;
-                                }
-
                                 return AssignmentCard(
                                   assignmentName: assignment['title'] ?? "",
                                   deadline: assignment['deadline'] ?? "",
                                   status: parseStatus(assignment['status'] ?? ""),
-                                  score: score,
+                                  score: assignment['score'] ?? "",
                                 );
                               }).toList(),
                             ),
@@ -464,26 +475,14 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Column(
-                              children: [
-                                LiveClassCard(
-                                  title: "Math Revision",
-                                  subtitle: "Algebra & Geometry",
-                                  status: LiveClassStatus.Live,
-                                  startsOn: "19 Dec 2025, 10:00 AM",
-                                ),
-                                LiveClassCard(
-                                  title: "Physics Lab",
-                                  subtitle: "Practical Experiments",
-                                  status: LiveClassStatus.Pending,
-                                  startsOn: "20 Dec 2025, 2:00 PM",
-                                ),
-                                LiveClassCard(
-                                  title: "English Literature",
-                                  subtitle: "Poetry Analysis",
-                                  status: LiveClassStatus.Finished,
-                                  startsOn: "18 Dec 2025, 11:00 AM",
-                                ),
-                              ],
+                                children:_liveclasses.map((liveclasses){
+                                  return LiveClassCard(
+                                    title: liveclasses['title'],
+                                    subtitle: liveclasses['description'],
+                                    status: LiveClassStatusX.fromString(liveclasses["status"]),
+                                    startsOn:liveclasses["startson"],
+                                  );
+                                }).toList()
                             ),
                           ),
                         ),

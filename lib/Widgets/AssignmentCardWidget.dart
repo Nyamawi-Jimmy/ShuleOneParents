@@ -6,7 +6,7 @@ class AssignmentCard extends StatelessWidget {
   final String assignmentName;
   final String deadline;
   final AssignmentStatus status;
-  final double? score;
+  final String? score;
   final VoidCallback? onShowResults;
   final VoidCallback? onStatement;
   final VoidCallback? onReceipt;
@@ -148,7 +148,7 @@ class AssignmentCard extends StatelessWidget {
 
                       // Score
                       Text(
-                        score != null ? "Score: ${score!.toStringAsFixed(1)}" : "—",
+                        score != null ? "Score: ${score!}" : "—",
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),

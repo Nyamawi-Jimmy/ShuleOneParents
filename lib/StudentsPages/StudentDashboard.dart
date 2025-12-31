@@ -15,6 +15,7 @@ import '../StudentControllers/FeeBalanceController.dart';
 import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
 import '../StudentControllers/StudentAssignmentsController.dart';
+import '../StudentControllers/StudentLIveClassesController.dart';
 import '../Widgets/AssignmentCardWidget.dart';
 import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/ExamActionRow.dart';
@@ -35,11 +36,15 @@ class _StudentdashboardState extends State<Studentdashboard> {
   MainExam? selectedExam;
   List<MainExam> exams = [];
   List<dynamic> _assignments = [];
+  List<dynamic> _liveclasses = [];
+
+
 
   @override
   void initState() {
     _mainexansdetails();
     _studentassignments();
+    _studentsliveclasses();
     super.initState();
   }
 
@@ -107,6 +112,22 @@ class _StudentdashboardState extends State<Studentdashboard> {
     } else {
       setState(() {
         _assignments = [];
+      });
+    }
+  }
+  void _studentsliveclasses() async {
+
+    final controller = Get.find<Studentliveclassescontroller>();
+    final response = await controller.studentliveclasses();
+
+    if (response.isSuccess) {
+      final List data = jsonDecode(response.message); // parse JSON
+      setState(() {
+        _liveclasses = data;
+      });
+    } else {
+      setState(() {
+        _liveclasses = [];
       });
     }
   }
@@ -434,21 +455,11 @@ class _StudentdashboardState extends State<Studentdashboard> {
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               children: _assignments.map((assignment) {
-                                double score = 0.0;
-
-                                // Parse score like "0/3"
-                                final scoreStr = assignment['score'] ?? "0";
-                                if (scoreStr.contains('/')) {
-                                  score = double.tryParse(scoreStr.split('/').first) ?? 0;
-                                } else {
-                                  score = double.tryParse(scoreStr) ?? 0;
-                                }
-
                                 return AssignmentCard(
                                   assignmentName: assignment['title'] ?? "",
                                   deadline: assignment['deadline'] ?? "",
                                   status: parseStatus(assignment['status'] ?? ""),
-                                  score: score,
+                                  score: assignment['score'] ?? "",
                                   onShowResults: (){},
                                 );
                               }).toList(),
@@ -461,26 +472,14 @@ class _StudentdashboardState extends State<Studentdashboard> {
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Column(
-                              children: [
-                                LiveClassCard(
-                                  title: "Math Revision",
-                                  subtitle: "Algebra & Geometry",
-                                  status: LiveClassStatus.Live,
-                                  startsOn: "19 Dec 2025, 10:00 AM",
-                                ),
-                                LiveClassCard(
-                                  title: "Physics Lab",
-                                  subtitle: "Practical Experiments",
-                                  status: LiveClassStatus.Pending,
-                                  startsOn: "20 Dec 2025, 2:00 PM",
-                                ),
-                                LiveClassCard(
-                                  title: "English Literature",
-                                  subtitle: "Poetry Analysis",
-                                  status: LiveClassStatus.Finished,
-                                  startsOn: "18 Dec 2025, 11:00 AM",
-                                ),
-                              ],
+                              children:_liveclasses.map((liveclasses){
+                                return LiveClassCard(
+                                  title: liveclasses['title'],
+                                  subtitle: liveclasses['description'],
+                                  status: LiveClassStatusX.fromString(liveclasses["status"]),
+                                  startsOn:liveclasses["startson"],
+                                );
+                              }).toList()
                             ),
                           ),
                         ),
