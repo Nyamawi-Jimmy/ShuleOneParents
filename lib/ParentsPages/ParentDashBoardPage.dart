@@ -1,5 +1,16 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import '../Authentication/AuthControllers/ParentControler.dart';
+import '../Models/MainExamsModal.dart';
+import '../ParentControllers/ParentMainExamsController.dart';
+import '../ParentControllers/ParentStudentPerormanceController.dart';
+import '../StudentControllers/FeeBalanceController.dart';
+import '../StudentControllers/GetStudentsPerformanceController.dart';
+import '../StudentControllers/MainExamsController.dart';
 import '../Widgets/AssignmentCardWidget.dart';
 import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/ExamActionRow.dart';
@@ -8,8 +19,6 @@ import '../Widgets/LiveClassCardWidget.dart';
 import '../Widgets/StatsMinCard.dart';
 import '../Widgets/SubjectMarksChart.dart';
 import '../Widgets/SubjectResutsTable.dart';
-import 'ParentProfilePage.dart';
-import 'SettingsParentPage.dart';
 
 class Parentdashboardpage extends StatefulWidget {
   const Parentdashboardpage({super.key});
@@ -19,15 +28,84 @@ class Parentdashboardpage extends StatefulWidget {
 }
 
 class _ParentdashboardpageState extends State<Parentdashboardpage> {
-  Exam? selectedExam;
-  int _currentIndex = 0;
+  MainExam? selectedExam;
+  List<MainExam> exams = [];
 
-  final List<Exam> exams = [
-    Exam(name: "Opener Exam", term: "Term 1", form: "Form 2"),
-    Exam(name: "Mid Term", term: "Term 2", form: "Form 3"),
-    Exam(name: "End Term", term: "Term 2", form: "Form 3"),
-    Exam(name: "Mock Exam", term: "Term 3", form: "Form 4"),
-  ];
+  @override
+  void initState() {
+    _parentmainexansdetails();
+    super.initState();
+  }
+
+  Map<String, double> _studentScores = {};
+  Map<String, double> _subjectAverages = {};
+  List<dynamic> _subjectResults = [];
+
+  void _parentmainexansdetails() async {
+    final parentController = Get.find<ParentController>();
+    final childId = parentController.selectedChildId;
+    final controller = Get.find<Parentmainexamscontroller>();
+    final response = await controller.getparentstudentmainexams(childId!);
+
+    if (response.isSuccess) {
+      final List data = jsonDecode(response.message);
+      print(response.message);
+
+      setState(() {
+        exams = data.map((e) => MainExam.fromJson(e)).toList();
+        selectedExam = exams.isNotEmpty ? exams.first : null;
+      });
+      if (selectedExam != null) {
+        _loadparentxamPerformance(selectedExam!.id);
+      }
+    }
+  }
+
+  void _loadparentxamPerformance(int examId) async {
+    final controller = Get.find<Parentstudentperormancecontroller>();
+    final response = await controller.getparentStudentPerformance(examId);
+
+    if (response.isSuccess) {
+      final List<dynamic> data = response.message;
+      _subjectResults = data; // 👈 store full response
+
+      double parseScore(String score) {
+        return double.parse(score.split('/').first);
+      }
+
+      /// Student scores
+      final Map<String, double> studentScores = {
+        for (final item in data) item['code']: parseScore(item['score']),
+      };
+
+      /// Subject averages
+      final Map<String, double> subjectAverages = {
+        for (final item in data)
+          item['code']: (item['average'] as num).toDouble(),
+      };
+      setState(() {
+        _studentScores = studentScores;
+        _subjectAverages = subjectAverages;
+      });
+    }
+  }
+
+  IconData meanTrendIcon(double dev) {
+    if (dev > 0) return Icons.trending_up;
+    if (dev < 0) return Icons.trending_down;
+    return Icons.trending_flat;
+  }
+
+  Color meanTrendColor(double dev) {
+    if (dev > 0) return Colors.green;
+    if (dev < 0) return Colors.red;
+    return Colors.grey;
+  }
+
+  String meanTrendValue(double dev) {
+    if (dev == 0) return "0.00";
+    return dev > 0 ? "+${dev.toStringAsFixed(2)}" : dev.toStringAsFixed(2);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,22 +125,29 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        border: Border.all(color: Colors.white),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Text(
-                          "ShuleOne Academy",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                    GetBuilder<ParentController>(
+                      builder: (controller) {
+                        return  Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            border: Border.all(color: Colors.white),
                           ),
-                        ),
-                      ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Text(
+                              controller.selectedChild?.school?.shortName ?? "",
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
+
+
                   ],
                 ),
                 Row(
@@ -76,12 +161,16 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          "Jimmy 👋",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        GetBuilder<ParentController>(
+                          builder: (controller) {
+                            return Text(
+                              "${controller.selectedChild?.firstName} 👋",
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -89,42 +178,52 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'profile') {
-                          Navigator.push(
+                          /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Parentprofilepage()),
-                          );
+                          );*/
                         } else if (value == 'settings') {
-                          Navigator.push(
+                          /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const Settingsparentpage()),
-                          );
+                          );*/
                         }
                       },
                       itemBuilder: (context) => [
-                         PopupMenuItem(
+                        PopupMenuItem(
                           value: 'profile',
                           child: ListTile(
-                            leading: Icon(Icons.person,color: theme.primaryColor,),
+                            leading: Icon(
+                              Icons.person,
+                              color: theme.primaryColor,
+                            ),
                             title: Text('Profile'),
                           ),
                         ),
-                         PopupMenuItem(
+                        PopupMenuItem(
                           value: 'settings',
                           child: ListTile(
-                            leading: Icon(Icons.settings,color: theme.primaryColor,),
+                            leading: Icon(
+                              Icons.settings,
+                              color: theme.primaryColor,
+                            ),
                             title: Text('Settings'),
                           ),
                         ),
                       ],
-                      child: ClipOval(
-                        child: Image.asset(
-                          "assets/images/shuleone.png",
-                          fit: BoxFit.cover,
-                          height: 40,
-                          width: 40,
-                        ),
+                      child: GetBuilder<ParentController>(
+                        builder: (controller) {
+                          return ClipOval(
+                            child: Image.network(
+                              controller.image,
+                              fit: BoxFit.cover,
+                              height: 40,
+                              width: 40,
+                            ),
+                          );
+                        },
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -156,7 +255,24 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: screenHeight * 0.02),
-                                BalanceCardWidget(),
+                                GetBuilder<FeeBalanceController>(
+                                  init: FeeBalanceController()..loadBalance(),
+                                  builder: (controller) {
+                                    if (controller.isLoading) {
+                                      return const SizedBox(
+                                        height: 90,
+                                        child: Center(child: CircularProgressIndicator()),
+                                      );
+                                    }
+
+                                    return BalanceCardWidget(
+                                      balance: controller.balance,
+                                      onStatement: () => debugPrint("Open statement"),
+                                      onReceipt: () => debugPrint("Open receipts"),
+                                      onPayment: () => debugPrint("Make payment"),
+                                    );
+                                  },
+                                ),
                                 SizedBox(height: screenHeight * 0.02),
 
                                 Text(
@@ -174,63 +290,105 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                   ),
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
-                                /*ExamActionRow(
+                                ExamActionRow(
                                   selectedExam: selectedExam,
                                   exams: exams,
                                   onExamChanged: (exam) {
                                     setState(() {
                                       selectedExam = exam;
+                                      _studentScores =
+                                      {}; // optional: clear old data
+                                      _subjectAverages = {};
                                     });
+
+                                    _loadparentxamPerformance(
+                                      exam!.id,
+                                    ); // 🔥 THIS WAS MISSING
                                   },
+
                                   onDownloadSelected: (type) {
-                                    if (type == "transcript") {
-                                      debugPrint("Download Transcript for $selectedExam");
-                                    } else if (type == "report") {
-                                      debugPrint("Download Report Form for $selectedExam");
-                                    }
+                                    debugPrint(
+                                      "$type for ${selectedExam?.examName}",
+                                    );
                                   },
-                                ),*/
+                                ),
                                 SizedBox(height: screenHeight * 0.02),
-                                //Gradescardwidget(),
+                                GradesCardWidget(selectedExam: selectedExam),
                                 SizedBox(height: screenHeight * 0.02),
                                 Row(
-                                  children: const [
+                                  children: [
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Mean Marks",
-                                        value: "66%",
-                                        trendIcon: Icons.trending_up,
-                                        trendValue: "7",
-                                        trendColor: Colors.green,
+                                        value: selectedExam != null
+                                            ? "${selectedExam!.mean.toStringAsFixed(2)}%"
+                                            : "--",
+                                        trendIcon: selectedExam != null
+                                            ? meanTrendIcon(selectedExam!.dev)
+                                            : Icons.trending_flat,
+                                        trendValue: selectedExam != null
+                                            ? meanTrendValue(selectedExam!.dev)
+                                            : "",
+                                        trendColor: selectedExam != null
+                                            ? meanTrendColor(selectedExam!.dev)
+                                            : Colors.grey,
                                       ),
                                     ),
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: StatsMiniCard(
                                         title: "Total Points",
-                                        value: "64/96",
-                                        trendIcon: Icons.trending_down,
-                                        trendValue: "7",
-                                        trendColor: Colors.red,
+                                        value: selectedExam != null
+                                            ? selectedExam!.points
+                                            .toStringAsFixed(2)
+                                            : "--",
+                                        trendIcon: selectedExam != null
+                                            ? meanTrendIcon(selectedExam!.dev)
+                                            : Icons.trending_flat,
+                                        trendValue: selectedExam != null
+                                            ? meanTrendValue(selectedExam!.dev)
+                                            : "",
+                                        trendColor: selectedExam != null
+                                            ? meanTrendColor(selectedExam!.dev)
+                                            : Colors.grey,
                                       ),
                                     ),
                                   ],
                                 ),
                                 SizedBox(height: screenHeight * 0.02),
-                                Row( children: const [ Expanded( child: StatsMiniCard( title: "Overall Position", value: "104/441", trendIcon: Icons.trending_up, trendValue: "60", trendColor: Colors.green, ), ), SizedBox(width: 12), Expanded( child: StatsMiniCard( title: "Stream Position", value: "16/55", trendIcon: Icons.trending_up, trendValue: "6", trendColor: Colors.green, ), ), ], ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: StatsMiniCard(
+                                        title: "Overall Position",
+                                        value: "--",
+                                        trendIcon: Icons.trending_flat,
+                                        trendValue: "--",
+                                        trendColor: Colors.grey,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: StatsMiniCard(
+                                        title: "Stream Position",
+                                        value: "--",
+                                        trendIcon: Icons.trending_flat,
+                                        trendValue: "--",
+                                        trendColor: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
                                 SizedBox(height: screenHeight * 0.02),
-                               /* SubjectMarksChart(
-                                  subjectMarks: {
-                                    "Math": 72,
-                                    "Eng": 65,
-                                    "Bio": 70,
-                                    "Chem": 58,
-                                    "Phy": 61,
-                                    "Geo": 75,
-                                  },
-                                ),*/
+                                SubjectMarksChart(
+                                  key: ValueKey(selectedExam?.id),
+                                  subjectMarks: _studentScores,
+                                  averageMarks: _subjectAverages,
+                                ),
+
                                 SizedBox(height: screenHeight * 0.02),
-                               // SubjectResultsTable(),
+                                SubjectResultsTable(results: _subjectResults),
                               ],
                             ),
                           ),
@@ -241,7 +399,7 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              children:  [
+                              children: [
                                 AssignmentCard(
                                   assignmentName: "Math Homework 1",
                                   deadline: "20 Dec 2025",
@@ -259,17 +417,16 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                   status: AssignmentStatus.Pending,
                                 ),
                               ],
-                            )
-
+                            ),
                           ),
                         ),
 
                         // 3️⃣ Live Classes tab
                         SingleChildScrollView(
                           child: Padding(
-                            padding:  EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(8.0),
                             child: Column(
-                              children:  [
+                              children: [
                                 LiveClassCard(
                                   title: "Math Revision",
                                   subtitle: "Algebra & Geometry",
@@ -289,8 +446,7 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                                   startsOn: "18 Dec 2025, 11:00 AM",
                                 ),
                               ],
-                            )
-                            ,
+                            ),
                           ),
                         ),
                       ],
@@ -299,8 +455,7 @@ class _ParentdashboardpageState extends State<Parentdashboardpage> {
                 ],
               ),
             ),
-          )
-
+          ),
         ],
       ),
     );

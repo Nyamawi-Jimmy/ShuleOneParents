@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import '../Routes/routes.dart';
+import '../StudentControllers/FeeBalanceController.dart';
 import '../Widgets/BalanceCardWidget.dart';
 import '../Widgets/InviteFriends.dart';
 import '../Widgets/ProfileRowItems.dart';
@@ -83,7 +85,24 @@ class _SettingsparentpageState extends State<Settingsparentpage> {
               child: Column(
                 children: [
                   SizedBox(height: screenHeight * 0.02),
-                  BalanceCardWidget(),
+                  GetBuilder<FeeBalanceController>(
+                    init: FeeBalanceController()..loadBalance(),
+                    builder: (controller) {
+                      if (controller.isLoading) {
+                        return const SizedBox(
+                          height: 90,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      return BalanceCardWidget(
+                        balance: controller.balance,
+                        onStatement: () => debugPrint("Open statement"),
+                        onReceipt: () => debugPrint("Open receipts"),
+                        onPayment: () => debugPrint("Make payment"),
+                      );
+                    },
+                  ),
                   SizedBox(height: screenHeight * 0.02),
                   InviteFriends(),
                   SizedBox(height: screenHeight * 0.02),

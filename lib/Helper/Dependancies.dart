@@ -10,6 +10,10 @@ import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Authentication/AuthControllers/RegGetClassesController.dart';
 import '../Authentication/AuthControllers/getNetAdmController.dart';
 import '../Authentication/AuthRepositories/nextAdmRepo.dart';
+import '../ParentControllers/ParentMainExamsController.dart';
+import '../ParentControllers/ParentStudentFeeBalanceController.dart';
+import '../ParentControllers/ParentStudentPerormanceController.dart';
+import '../ParentRepositories/StudentDashBoardRepo.dart';
 import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
 import '../StudentControllers/StudentFeeBAlanceController.dart';
@@ -24,6 +28,7 @@ Future <void> init() async{
   Get.lazyPut(()=>Nextadmrepo(apiClient: Get.find()));
   Get.lazyPut(()=>Authrepo(apiClient: Get.find(), sharedPreferences: Get.find()));
   Get.lazyPut(()=>Mainexamsrepo(apiClient: Get.find()));
+  Get.lazyPut(()=>Studentdashboardrepo(apiClient: Get.find()));
 
 
   Get.lazyPut(()=>Logincontroller(authrepo: Get.find()));
@@ -34,6 +39,9 @@ Future <void> init() async{
   Get.lazyPut(()=>Mainexamscontroller(mainexamsrepo: Get.find()));
   Get.lazyPut(()=>Studentfeebalancecontroller(mainexamsrepo: Get.find()));
   Get.lazyPut(()=>Getstudentsperformancecontroller(mainexamsrepo: Get.find()));
+  Get.lazyPut(()=>Parentstudentfeebalancecontroller(studentdashboardrepo: Get.find()));
+  Get.lazyPut(()=>Parentstudentperormancecontroller(studentdashboardrepo: Get.find()));
+  Get.lazyPut(()=>Parentmainexamscontroller(studentdashboardrepo: Get.find()));
 
 
 }

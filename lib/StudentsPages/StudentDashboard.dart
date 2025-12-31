@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:shuleoneparents/Data/Api/apiclient.dart';
 
+import '../Authentication/AuthControllers/ParentControler.dart';
 import '../Models/MainExamsModal.dart';
 import '../Models/StudentFeeBAlanceMOdel.dart';
+import '../StudentControllers/FeeBalanceController.dart';
 import '../StudentControllers/GetStudentsPerformanceController.dart';
 import '../StudentControllers/MainExamsController.dart';
 import '../Widgets/AssignmentCardWidget.dart';
@@ -34,6 +37,7 @@ class _StudentdashboardState extends State<Studentdashboard> {
     _mainexansdetails();
     super.initState();
   }
+
   Map<String, double> _studentScores = {};
   Map<String, double> _subjectAverages = {};
   List<dynamic> _subjectResults = [];
@@ -67,10 +71,10 @@ class _StudentdashboardState extends State<Studentdashboard> {
       double parseScore(String score) {
         return double.parse(score.split('/').first);
       }
+
       /// Student scores
       final Map<String, double> studentScores = {
-        for (final item in data)
-          item['code']: parseScore(item['score']),
+        for (final item in data) item['code']: parseScore(item['score']),
       };
 
       /// Subject averages
@@ -102,7 +106,6 @@ class _StudentdashboardState extends State<Studentdashboard> {
     return dev > 0 ? "+${dev.toStringAsFixed(2)}" : dev.toStringAsFixed(2);
   }
 
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -121,22 +124,29 @@ class _StudentdashboardState extends State<Studentdashboard> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        border: Border.all(color: Colors.white),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Text(
-                          "ShuleOne Academy",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                    GetBuilder<ParentController>(
+                      builder: (controller) {
+                        return  Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            border: Border.all(color: Colors.white),
                           ),
-                        ),
-                      ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Text(
+                              controller.school!.shortName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
+
+
                   ],
                 ),
                 Row(
@@ -150,12 +160,16 @@ class _StudentdashboardState extends State<Studentdashboard> {
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          "Jimmy 👋",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        GetBuilder<ParentController>(
+                          builder: (controller) {
+                            return Text(
+                              "${controller.fullName} 👋",
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -196,13 +210,17 @@ class _StudentdashboardState extends State<Studentdashboard> {
                           ),
                         ),
                       ],
-                      child: ClipOval(
-                        child: Image.asset(
-                          "assets/images/shuleone.png",
-                          fit: BoxFit.cover,
-                          height: 40,
-                          width: 40,
-                        ),
+                      child: GetBuilder<ParentController>(
+                        builder: (controller) {
+                          return ClipOval(
+                            child: Image.network(
+                              controller.image,
+                              fit: BoxFit.cover,
+                              height: 40,
+                              width: 40,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -236,7 +254,24 @@ class _StudentdashboardState extends State<Studentdashboard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: screenHeight * 0.02),
-                                BalanceCardWidget(),
+                                GetBuilder<FeeBalanceController>(
+                                  init: FeeBalanceController()..loadBalance(),
+                                  builder: (controller) {
+                                    if (controller.isLoading) {
+                                      return const SizedBox(
+                                        height: 90,
+                                        child: Center(child: CircularProgressIndicator()),
+                                      );
+                                    }
+
+                                    return BalanceCardWidget(
+                                      balance: controller.balance,
+                                      onStatement: () => debugPrint("Open statement"),
+                                      onReceipt: () => debugPrint("Open receipts"),
+                                      onPayment: () => debugPrint("Make payment"),
+                                    );
+                                  },
+                                ),
                                 SizedBox(height: screenHeight * 0.02),
 
                                 Text(
@@ -260,11 +295,14 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                   onExamChanged: (exam) {
                                     setState(() {
                                       selectedExam = exam;
-                                      _studentScores = {};       // optional: clear old data
+                                      _studentScores =
+                                          {}; // optional: clear old data
                                       _subjectAverages = {};
                                     });
 
-                                    _loadExamPerformance(exam!.id); // 🔥 THIS WAS MISSING
+                                    _loadExamPerformance(
+                                      exam!.id,
+                                    ); // 🔥 THIS WAS MISSING
                                   },
 
                                   onDownloadSelected: (type) {
@@ -300,7 +338,8 @@ class _StudentdashboardState extends State<Studentdashboard> {
                                       child: StatsMiniCard(
                                         title: "Total Points",
                                         value: selectedExam != null
-                                            ? selectedExam!.points.toStringAsFixed(2)
+                                            ? selectedExam!.points
+                                                  .toStringAsFixed(2)
                                             : "--",
                                         trendIcon: selectedExam != null
                                             ? meanTrendIcon(selectedExam!.dev)

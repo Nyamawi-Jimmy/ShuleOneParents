@@ -128,6 +128,7 @@ class _StudentprofilesState extends State<Studentprofiles> {
 
     return InkWell(
       onTap: (){
+        parentController.selectChild(learner);
         Navigator.pushNamed(context, RouteHelper.parenthomepage);
       },
       child: Card(
@@ -153,7 +154,7 @@ class _StudentprofilesState extends State<Studentprofiles> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      learner.firstName + learner.secondName,
+                      "${learner.firstName} ${learner.secondName}",
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

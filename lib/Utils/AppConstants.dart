@@ -16,7 +16,15 @@ class AppConstants {
   static String STUDENT_EXAM_PERFORMANCE(int examId) {
     return "/api/elearning/getExamPerformance?examId=$examId";
   }
+  static String PARENT_STUDENT_GET_FEEBALANCE(int studentid) {
+    return "/api/parent/getstudentbalance/$studentid";
+  }
 
-
+  static String PARENT_MAIN_EXAMS(int studentid) {
+    return "/api/parent/getmainexams/$studentid";
+  }
+  static String PARENT_EXAM_PERFORMANCE(int examId) {
+    return "/api/parent/getExamPerformance?examId=$examId";
+  }
 
 }
