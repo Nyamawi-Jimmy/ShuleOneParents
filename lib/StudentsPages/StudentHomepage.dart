@@ -6,6 +6,8 @@ import '../ParentsPages/CodingPage.dart';
 import '../ParentsPages/CommunicationPages.dart';
 import '../ParentsPages/ResourcesPage.dart';
 import '../ParentsPages/TransportPage.dart';
+import 'CodingStudentPage.dart';
+import 'StudentResourcesPage.dart';
 
 
 class Studenthomepage extends StatefulWidget {
@@ -20,8 +22,8 @@ class _StudenthomepageState extends State<Studenthomepage> {
 
   final List<Widget> _pages = const [
     Studentdashboard(),
-    Codingpage(),
-    Resourcespage(),
+    Codingstudentpage(),
+    Studentresourcespage(),
     TransportPage(),
     //Parentprofilepage(),
     Communicationpages(),

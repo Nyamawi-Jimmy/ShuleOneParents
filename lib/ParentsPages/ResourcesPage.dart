@@ -106,7 +106,7 @@ class _ResourcespageState extends State<Resourcespage> {
                     child: TabBarView(
                       children: [
                         // 1️⃣ Dashboard tab
-                        EbookLibraryPage(),
+                        EbookLibraryParentPage(),
                         // 2️⃣ Assignments tab
                         PastPapersPage(),                        // 3️⃣ Live Classes tab
                         Parentsquizpage(),

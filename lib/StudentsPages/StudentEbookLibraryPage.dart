@@ -1,60 +1,93 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class EbookLibraryParentPage extends StatefulWidget {
-  const EbookLibraryParentPage({super.key});
+import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+
+import '../StudentControllers/ResourcesAllBooksController.dart';
+import '../StudentControllers/ResourcesGenresControllers.dart';
+
+class Studentebooklibrarypage extends StatefulWidget {
+  const Studentebooklibrarypage({super.key});
 
   @override
-  State<EbookLibraryParentPage> createState() => _EbookLibraryParentPageState();
+  State<Studentebooklibrarypage> createState() => _StudentebooklibrarypageState();
 }
 
-class _EbookLibraryParentPageState extends State<EbookLibraryParentPage> {
+class _StudentebooklibrarypageState extends State<Studentebooklibrarypage> {
+  List<String> genres = ["All"];
   String selectedGenre = "All";
+  @override
+  void initState() {
+    _studentelibrarygenres();
+    _studentelibraryallbooks();
+    super.initState();
+  }
 
-  final List<String> genres = [
-    "All",
-    "Science",
-    "Mathematics",
-    "Technology",
-    "History",
-    "Literature",
-  ];
+  void _studentelibrarygenres() async {
+    final controller = Get.find<Resourcesgenrescontrollers>();
+    final response = await controller.getstudentcoding();
 
-  final List<Map<String, String>> books = [
-    {
-      "title": "Physics Fundamentals",
-      "author": "Isaac Newton",
-      "genre": "Science",
-      "image": "assets/images/shuleone.png",
-    },
-    {
-      "title": "Pure Mathematics",
-      "author": "Leonhard Euler",
-      "genre": "Mathematics",
-      "image": "assets/images/shuleone.png",
-    },
-    {
-      "title": "Flutter in Action",
-      "author": "Google Dev Team",
-      "genre": "Technology",
-      "image": "assets/images/shuleone.png",
-    },
-    {
-      "title": "World History",
-      "author": "Howard Zinn",
-      "genre": "History",
-      "image": "assets/images/shuleone.png",
-    },
-    {
-      "title": "Classic Literature",
-      "author": "William Shakespeare",
-      "genre": "Literature",
-      "image": "assets/images/shuleone.png",
-    },
-  ];
+    if (response.isSuccess) {
+      final List data = response.message; // decode the JSON
+      setState(() {
+        // Add the genre names from the response to your list
+        genres = [
+          "All", // keep default
+          ...data.map((e) => e['name'].toString()) // extract names
+        ];
+      });
+
+      // debug print
+      print("Genres loaded: $genres");
+    } else {
+      setState(() {
+        genres = ["All"]; // fallback if request fails
+      });
+    }
+  }
+  List<Map<String, String>> books = []; // start empty
+
+  void _studentelibraryallbooks() async {
+    final controller = Get.find<Resourcesallbookscontroller>();
+    final response = await controller.getresourcesallbooks();
+
+    if (response.isSuccess) {
+      final List data =response.message; // decode JSON
+      print("Books loaded: $data");
+
+      setState(() {
+        books = data.map<Map<String, String>>((e) {
+          String genre = "";
+          if (e['genres'] != null && e['genres'].isNotEmpty) {
+            genre = e['genres'][0]['name'] ?? "";
+          }
+
+          return {
+            "title": e['title'] ?? "",
+            "author": e['author'] ?? "",
+            "genre": genre,
+            "image": e['cover'] ?? "assets/images/shuleone.png", // fallback
+          };
+        }).toList();
+
+      });
+    } else {
+      setState(() {
+        books = []; // fallback empty list
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    if (books.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Filtered books by genre
     final filteredBooks = selectedGenre == "All"
         ? books
         : books.where((b) => b["genre"] == selectedGenre).toList();
@@ -121,14 +154,21 @@ class _EbookLibraryParentPageState extends State<EbookLibraryParentPage> {
 
         /// ================= BOOK GRID =================
         Expanded(
-          child: GridView.builder(
+          child: filteredBooks.isEmpty
+              ? Center(
+            child: Text(
+              "No books available for '$selectedGenre'",
+              style: theme.textTheme.bodyMedium,
+            ),
+          )
+              : GridView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: filteredBooks.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 14,
               mainAxisSpacing: 14,
-              childAspectRatio: 0.62,
+              childAspectRatio: 0.55,
             ),
             itemBuilder: (context, index) {
               final book = filteredBooks[index];
@@ -153,8 +193,20 @@ class _EbookLibraryParentPageState extends State<EbookLibraryParentPage> {
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(16),
                       ),
-                      child: Image.asset(
+                      child: book["image"]!.isNotEmpty
+                          ? Image.network(
                         book["image"]!,
+                        height: 170,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            Image.asset("assets/images/shuleone.png",
+                                height: 170,
+                                width: double.infinity,
+                                fit: BoxFit.cover),
+                      )
+                          : Image.asset(
+                        "assets/images/shuleone.png",
                         height: 170,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -192,7 +244,8 @@ class _EbookLibraryParentPageState extends State<EbookLibraryParentPage> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: theme.primaryColor.withOpacity(0.1),
+                                color:
+                                theme.primaryColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(

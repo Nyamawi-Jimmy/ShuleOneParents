@@ -36,6 +36,11 @@ class AppConstants {
     return "/api/parent/getliveclasses/$studentid";
   }
 
+  static String STUDENT_CODING(int languageid) {
+    return "/api/courses/topics/$languageid";
+  }
 
+  static const String RESOURCE_GENRES ="/api/lib/genres/get/all";
+  static const String RESOURCE_ALL_BOOKS ="/api/lib/books/get/all";
 
 }
